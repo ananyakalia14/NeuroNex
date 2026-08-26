@@ -7,7 +7,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { reverseGeocodeIndia } from '../utils/indiaEmergency';
-import { soundEffects } from '../services/soundEffects';
+
 
 export interface LiveLocationState {
   lat: number;
@@ -92,7 +92,6 @@ export function useLiveLocation(onLocationChange?: (lat: number, lng: number, ad
       }
 
       setLocation((prev) => ({ ...prev, isLocating: true, error: null }));
-      soundEffects.playRecalculateSweep();
 
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
@@ -115,7 +114,6 @@ export function useLiveLocation(onLocationChange?: (lat: number, lng: number, ad
             error: null,
           }));
 
-          soundEffects.playSuccess();
           updateAddress(lat, lng);
           resolve({ lat, lng });
         },
@@ -152,8 +150,8 @@ export function useLiveLocation(onLocationChange?: (lat: number, lng: number, ad
 
     if (!('geolocation' in navigator)) return;
 
-    soundEffects.playDispatchConfirmed();
     setLocation((prev) => ({ ...prev, isTracking: true, error: null }));
+
 
     const id = navigator.geolocation.watchPosition(
       (pos) => {

@@ -210,11 +210,17 @@ export function PatientPortal({
               <button
                 type="button"
                 className={`patient-portal__icon-btn ${voiceActive ? 'patient-portal__icon-btn--active' : ''}`}
-                onClick={() => setVoiceActive(!voiceActive)}
-                title={voiceActive ? 'Mute Voice' : 'Unmute Voice'}
+                onClick={() => {
+                  if (voiceActive && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                  }
+                  setVoiceActive(!voiceActive);
+                }}
+                title={voiceActive ? 'Mute Voice Prompts' : 'Unmute Voice Prompts'}
               >
                 {voiceActive ? <Volume2 size={15} /> : <VolumeX size={15} />}
               </button>
+
             </header>
 
             {/* ── 2. Master Emergency SOS Action ── */}

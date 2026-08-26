@@ -8,10 +8,16 @@ class SoundSynthesizer {
   private enabled: boolean = true;
 
   constructor() {
-    // Lazy AudioContext initialization on first user gesture
+    try {
+      const saved = localStorage.getItem('jeevraah_sound_enabled');
+      if (saved !== null) {
+        this.enabled = saved === 'true';
+      }
+    } catch {}
   }
 
   private getContext(): AudioContext | null {
+    if (!this.enabled) return null;
     if (!this.ctx && typeof window !== 'undefined') {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       if (AudioCtx) {
@@ -26,7 +32,32 @@ class SoundSynthesizer {
 
   public setEnabled(val: boolean) {
     this.enabled = val;
+    try {
+      localStorage.setItem('jeevraah_sound_enabled', val.toString());
+    } catch {}
+    if (!val && this.ctx && this.ctx.state === 'running') {
+      this.ctx.suspend().catch(() => {});
+    }
   }
+
+  public isEnabled(): boolean {
+    return this.enabled;
+  }
+
+  public toggleSound(): boolean {
+    this.setEnabled(!this.enabled);
+    return this.enabled;
+  }
+
+  public stopAll() {
+    if (this.ctx && this.ctx.state === 'running') {
+      this.ctx.suspend().catch(() => {});
+    }
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+  }
+
 
   /**
    * High-priority Emergency SOS Alert Chime

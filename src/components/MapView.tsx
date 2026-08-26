@@ -28,8 +28,11 @@ import {
   X,
   ChevronRight,
   Crosshair,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { INITIAL_EMERGENCY_CASES, type RegionalEmergencyCase } from '../data/emergencyCases';
+
 import { MUMBAI_MMR_HOSPITALS, MUMBAI_HOSPITAL_COORDINATES } from '../data/mumbaiHospitals';
 import { soundEffects } from '../services/soundEffects';
 import { calculateBearing } from '../services/realRoadRouter';
@@ -156,16 +159,19 @@ export function MapView({
   const patientMarkerRef = useRef<L.Marker | null>(null);
   const movingAmbulanceMarkerRef = useRef<L.Marker | null>(null);
   const animFrameRef = useRef<number>(0);
+  const lastHandledDispatchKeyRef = useRef<string | null>(null);
 
   // Predefined Case Animation references
   const presetAmbMarkersRef = useRef<{ [caseId: string]: L.Marker }>({});
   const presetPolylinesRef = useRef<{ [caseId: string]: L.Polyline }>({});
 
+  const [isMuted, setIsMuted] = useState<boolean>(() => !soundEffects.isEnabled());
   const [currentTheme, setCurrentTheme] = useState<'voyager' | 'dark' | 'osm' | 'google_hybrid' | 'google_satellite'>('voyager');
   const [activeLegStage, setActiveLegStage] = useState<AnimationStage>('EN_ROUTE_PATIENT');
   const [liveEta, setLiveEta] = useState<number>(0);
   const [liveDist, setLiveDist] = useState<number>(0);
   const [liveSpeed, setLiveSpeed] = useState<number>(65);
+
 
   // Dynamic Patient Coordinates
   const patientLat = userLat || DEFAULT_PATIENT_LAT;
@@ -534,7 +540,16 @@ export function MapView({
 
   // ── 6. Single-Run Animation Engine for Custom User Dispatches ──
   useEffect(() => {
-    if (!activeDispatch || !mapRef.current || !routeLayerGroupRef.current) return;
+    if (!activeDispatch || !mapRef.current || !routeLayerGroupRef.current) {
+      lastHandledDispatchKeyRef.current = null;
+      return;
+    }
+
+    const currentKey = `${activeDispatch.id || activeDispatch.patientId}-${activeDispatch.timestamp}`;
+    if (lastHandledDispatchKeyRef.current === currentKey) {
+      return;
+    }
+    lastHandledDispatchKeyRef.current = currentKey;
 
     soundEffects.playDispatchConfirmed();
 
@@ -555,6 +570,7 @@ export function MapView({
     const targetHosp = hospitals.find((h) => h.id === activeDispatch.assignedHospitalId) || hospitals[0] || DEFAULT_HOSPITALS[0];
     const hospCoordObj = REAL_HOSPITAL_COORDS[targetHosp.id] || REAL_HOSPITAL_COORDS[0];
     const hospCoord: [number, number] = [hospCoordObj.lat, hospCoordObj.lng];
+
 
     const leg1MidLat = (depotCoord[0] + patientCoord[0]) / 2;
     const leg1MidLng = (depotCoord[1] + patientCoord[1]) / 2 + 0.001;
@@ -647,6 +663,10 @@ export function MapView({
     let currentStage: AnimationStage = 'EN_ROUTE_PATIENT';
     setActiveLegStage('EN_ROUTE_PATIENT');
 
+    let playedPickupSound = false;
+    let playedRushingSound = false;
+    let playedArrivedSound = false;
+
     const animateStep = (now: number) => {
       const elapsed = now - animStartTime;
 
@@ -673,7 +693,10 @@ export function MapView({
           currentStage = 'PATIENT_PICKUP';
           setActiveLegStage('PATIENT_PICKUP');
           animStartTime = now;
-          soundEffects.playEmergencyAlert();
+          if (!playedPickupSound) {
+            playedPickupSound = true;
+            soundEffects.playEmergencyAlert();
+          }
           ambulanceMarker.setLatLng(patientCoord);
         }
         animFrameRef.current = requestAnimationFrame(animateStep);
@@ -688,7 +711,10 @@ export function MapView({
           currentStage = 'RUSHING_HOSPITAL';
           setActiveLegStage('RUSHING_HOSPITAL');
           animStartTime = now;
-          soundEffects.playRecalculateSweep();
+          if (!playedRushingSound) {
+            playedRushingSound = true;
+            soundEffects.playRecalculateSweep();
+          }
         }
         animFrameRef.current = requestAnimationFrame(animateStep);
       } else if (currentStage === 'RUSHING_HOSPITAL') {
@@ -717,12 +743,16 @@ export function MapView({
           setLiveDist(0);
           setLiveEta(0);
           setLiveSpeed(0);
-          soundEffects.playSuccess();
+          if (!playedArrivedSound) {
+            playedArrivedSound = true;
+            soundEffects.playSuccess();
+          }
           return;
         }
         animFrameRef.current = requestAnimationFrame(animateStep);
       }
     };
+
 
     animFrameRef.current = requestAnimationFrame(animateStep);
 
@@ -832,6 +862,18 @@ export function MapView({
           <Crosshair size={18} className={isLiveGPS ? 'text-primary animate-pulse' : ''} />
         </button>
 
+        {/* 🔊 Tactical Audio Mute/Unmute Button */}
+        <button
+          className="map-view__ctrl-btn clay-btn clay-btn--icon"
+          onClick={() => {
+            const enabled = soundEffects.toggleSound();
+            setIsMuted(!enabled);
+          }}
+          title={isMuted ? 'Unmute Sound Effects' : 'Mute Sound Effects'}
+        >
+          {isMuted ? <VolumeX size={16} className="text-danger" /> : <Volume2 size={16} />}
+        </button>
+
         <button
           className="map-view__ctrl-btn clay-btn clay-btn--icon"
           onClick={() => {
@@ -847,6 +889,7 @@ export function MapView({
           <RotateCcw size={16} />
         </button>
       </div>
+
 
       {/* BOTTOM ACTIVE TELEMETRY HUD */}
       <div className="map-view__telemetry-hud clay-card--flat">
