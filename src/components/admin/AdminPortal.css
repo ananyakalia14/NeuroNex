@@ -3,13 +3,16 @@
 .admin-portal {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
+  gap: 12px;
   height: 100%;
   overflow-y: auto;
 }
 
 .admin-portal__card {
-  padding: var(--sp-3) var(--sp-4);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .admin-portal__header {
@@ -17,154 +20,98 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--sp-3);
+  gap: 10px;
 }
 
 .admin-portal__identity {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
+  gap: 10px;
 }
 
 .admin-portal__avatar {
-  font-size: 28px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--jr-teal-light);
+  font-size: 24px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #f0fdf4;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--clay-shadow);
+  border: 1px solid #bbf7d0;
+  flex-shrink: 0;
 }
 
 .admin-portal__title {
-  font-size: var(--font-lg);
+  font-size: 14px;
   font-weight: 700;
-  color: var(--jr-green-deep);
+  color: #0f172a;
   margin: 0;
+  line-height: 1.2;
 }
 
-.admin-portal__mini-metric {
-  padding: var(--sp-2) var(--sp-3);
+.admin-portal__kpi-strip {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.admin-portal__kpi-pill {
+  padding: 4px 8px;
+  border-radius: 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-radius: var(--radius-md);
+  min-width: 60px;
 }
 
+/* Tabs */
 .admin-portal__tabs {
   display: flex;
-  gap: var(--sp-2);
+  gap: 4px;
+  padding: 3px;
+  background: #f1f5f9;
+  border-radius: 8px;
   overflow-x: auto;
-  padding-bottom: 2px;
 }
 
-.admin-portal__tab {
+.admin-portal__tab-btn {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
-  padding: var(--sp-2) var(--sp-4);
-  font-size: var(--font-xs);
-  font-weight: 700;
-  border-radius: var(--radius-pill);
-  background: var(--jr-surface);
-  color: var(--jr-text-secondary);
+  gap: 5px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
   border: none;
+  background: transparent;
   cursor: pointer;
-  box-shadow: var(--clay-shadow);
-  transition: all var(--transition-fast);
   white-space: nowrap;
+  transition: all 0.15s ease;
 }
 
-.admin-portal__tab--active {
-  background: var(--jr-green-deep);
-  color: var(--jr-text-inverse);
-  box-shadow: var(--clay-shadow-hover);
+.admin-portal__tab-btn:hover {
+  color: #0f172a;
+}
+
+.admin-portal__tab-btn--active {
+  background: #ffffff;
+  color: #047857;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .admin-portal__section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-4);
-}
-
-.admin-portal__block-tool {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-3);
-}
-
-.admin-portal__blocked-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-}
-
-.admin-portal__blocked-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--sp-2);
-}
-
-@media (min-width: 600px) {
-  .admin-portal__blocked-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.admin-portal__blocked-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--sp-2) var(--sp-3);
-  border-radius: var(--radius-md);
-}
-
-/* Sliders */
-.admin-portal__sliders {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--sp-3);
-}
-
-@media (min-width: 600px) {
-  .admin-portal__sliders {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.admin-portal__slider-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-  padding: var(--sp-3);
-  border-radius: var(--radius-md);
-}
-
-.admin-portal__slider {
-  width: 100%;
-  accent-color: var(--jr-green);
-  cursor: pointer;
-}
-
-/* Fleet */
-.admin-portal__amb-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: var(--sp-2);
+  padding: 12px 14px;
 }
 
 .admin-portal__amb-card {
-  padding: var(--sp-2) var(--sp-3) !important;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  transition: all 0.12s ease;
 }
 
-.admin-portal__export-box {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--sp-4);
-  border-radius: var(--radius-md);
-  flex-wrap: wrap;
-  gap: var(--sp-3);
+.admin-portal__amb-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }

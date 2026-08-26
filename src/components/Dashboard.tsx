@@ -308,9 +308,13 @@ export function Dashboard() {
 
   const totalBeds = hospitals.reduce((sum, h) => sum + h.bedsAvailable, 0);
 
-  // Active hospital for hospital role
-  const activeHospital = hospitals.find((h) => h.id === (profile.hospitalId ?? 0)) || hospitals[0];
-  const inboundDispatches = dispatches.filter((d) => d.assignedHospitalId === (profile.hospitalId ?? 0));
+  // Active hospital for hospital role (with dynamic 77-hospital switcher support)
+  const [selectedHospitalForPortal, setSelectedHospitalForPortal] = useState<number>(profile.hospitalId ?? 0);
+  const activeHospital =
+    MUMBAI_MMR_HOSPITALS.find((h) => h.id === selectedHospitalForPortal) ||
+    hospitals.find((h) => h.id === selectedHospitalForPortal) ||
+    MUMBAI_MMR_HOSPITALS[0];
+  const inboundDispatches = dispatches.filter((d) => d.assignedHospitalId === activeHospital.id);
 
   return (
     <div className="dashboard" id="main-dashboard">
@@ -352,8 +356,6 @@ export function Dashboard() {
                     />
                   )}
 
-
-
                   {/* 🚑 108 AMBULANCE DRIVER / PILOT PORTAL */}
                   {role === 'driver' && (
                     <DriverPortal
@@ -366,11 +368,17 @@ export function Dashboard() {
                   {role === 'hospital' && activeHospital && (
                     <HospitalPortal
                       hospital={activeHospital}
+                      allHospitals={MUMBAI_MMR_HOSPITALS}
+                      onSelectHospital={(id) => {
+                        setSelectedHospitalForPortal(id);
+                        setSelectedHospitalId(id);
+                      }}
                       onUpdateBeds={handleUpdateBeds}
                       onUpdateMedicine={handleUpdateMedicine}
                       incomingDispatches={inboundDispatches}
                     />
                   )}
+
 
                   {/* 🛡️ ADMIN COMMANDER PORTAL */}
                   {role === 'admin' && (
