@@ -62,47 +62,46 @@ const TRIAGE_OPTIONS: TriageOption[] = [
 ];
 
 
-interface SpecialistOption {
+interface SpecialistDefinition {
   id: string;
   name: string;
   specialty: Specialty;
   icon: string;
-  facility: string;
   urgency: UrgencyTier;
-  targetHospitalId?: number;
 }
 
-const SPECIALIST_LIST: SpecialistOption[] = [
-  { id: 'cardio', name: 'Interventional Cardiologist', specialty: 'cardiology', icon: '🫀', facility: 'AIMS Super-Specialty (24/7 Cath Lab)', urgency: 1, targetHospitalId: 0 },
-  { id: 'neuro', name: 'Emergency Neurologist', specialty: 'neurology', icon: '🧠', facility: 'RR Multi-Specialty (CT/MRI Ready)', urgency: 1, targetHospitalId: 2 },
-  { id: 'ortho', name: 'Trauma & Orthopedic Surgeon', specialty: 'orthopedics', icon: '🦴', facility: 'Icon Trauma Hospital (OT Ready)', urgency: 2, targetHospitalId: 4 },
-  { id: 'obgyn', name: 'Emergency Obstetrician', specialty: 'obstetrics', icon: '🤰', facility: 'Shastri Nagar Civic Hospital (NICU)', urgency: 1, targetHospitalId: 1 },
-  { id: 'icu', name: 'Critical Care Intensivist', specialty: 'emergency', icon: '🩺', facility: 'Fortis Hospital Mulund (Level-1 ICU)', urgency: 1, targetHospitalId: 25 },
-  { id: 'pediatric', name: 'Pediatric Emergency Specialist', specialty: 'pediatrics', icon: '👶', facility: 'SRCC Children Hospital & KEM', urgency: 2, targetHospitalId: 50 },
-  { id: 'toxico', name: 'Snakebite & Toxicologist', specialty: 'emergency', icon: '🐍', facility: 'District Civil Hospital Thane', urgency: 1, targetHospitalId: 45 },
-  { id: 'burns', name: 'Burns & Trauma Specialist', specialty: 'emergency', icon: '🔥', facility: 'National Burns Center & CSMH', urgency: 1, targetHospitalId: 10 },
+const SPECIALIST_DEFINITIONS: SpecialistDefinition[] = [
+  { id: 'cardio', name: 'Interventional Cardiologist', specialty: 'cardiology', icon: '🫀', urgency: 1 },
+  { id: 'neuro', name: 'Emergency Neurologist', specialty: 'neurology', icon: '🧠', urgency: 1 },
+  { id: 'ortho', name: 'Trauma & Orthopedic Surgeon', specialty: 'orthopedics', icon: '🦴', urgency: 2 },
+  { id: 'obgyn', name: 'Emergency Obstetrician', specialty: 'obstetrics', icon: '🤰', urgency: 1 },
+  { id: 'icu', name: 'Critical Care Intensivist', specialty: 'emergency', icon: '🩺', urgency: 1 },
+  { id: 'pediatric', name: 'Pediatric Emergency Specialist', specialty: 'pediatrics', icon: '👶', urgency: 2 },
+  { id: 'ophthal', name: 'Ophthalmic Eye Trauma Specialist', specialty: 'ophthalmology', icon: '👁️', urgency: 2 },
+  { id: 'general_er', name: 'General Emergency Physician', specialty: 'general', icon: '🏥', urgency: 3 },
 ];
 
-interface MedicineItem {
+interface MedicineDefinition {
   id: string;
   name: string;
-  stock: string;
-  hospital: string;
+  key: string;
   icon: string;
   urgency: UrgencyTier;
-  targetHospitalId?: number;
 }
 
-const CRITICAL_MEDICINES: MedicineItem[] = [
-  { id: 'asv', name: 'Polyvalent Snake Antivenom', stock: '24 Vials Ready', hospital: 'AIMS Hospital & ICU', icon: '🐍', urgency: 1, targetHospitalId: 0 },
-  { id: 'streptokinase', name: 'Streptokinase (Thrombolytic)', stock: '12 Vials Ready', hospital: 'RR Multi-Specialty', icon: '💉', urgency: 1, targetHospitalId: 2 },
-  { id: 'atropine', name: 'Atropine Antidote (OP Poison)', stock: '30 Vials Available', hospital: 'Shastri Nagar Civic', icon: '🧪', urgency: 1, targetHospitalId: 1 },
-  { id: 'mannitol', name: 'IV Mannitol 20% (Neuro Decompress)', stock: '18 Bottles Ready', hospital: 'KEM Hospital & ER', icon: '💧', urgency: 1, targetHospitalId: 50 },
-  { id: 'blood', name: 'O-Negative Emergency Packed RBCs', stock: '6 Units Reserved', hospital: 'Lilavati Blood Bank', icon: '🩸', urgency: 1, targetHospitalId: 24 },
-  { id: 'salbutamol', name: 'Inhaled Salbutamol & Ipratropium', stock: '40 Nebules Ready', hospital: 'Cooper Civic ER', icon: '💨', urgency: 2, targetHospitalId: 52 },
-  { id: 'tranexamic', name: 'Tranexamic Acid (Hemostatic)', stock: '35 Ampoules Ready', hospital: 'Fortis Mulund', icon: '🩹', urgency: 1, targetHospitalId: 25 },
-  { id: 'rabies', name: 'Anti-Rabies & Tetanus Serum', stock: '50 Doses Available', hospital: 'Rajawadi Hospital', icon: '🛡️', urgency: 2, targetHospitalId: 55 },
+const MEDICINE_DEFINITIONS: MedicineDefinition[] = [
+  { id: 'asv', name: 'Polyvalent Snake Antivenom', key: 'antivenom', icon: '🐍', urgency: 1 },
+  { id: 'streptokinase', name: 'Streptokinase (Thrombolytic)', key: 'streptokinase', icon: '💉', urgency: 1 },
+  { id: 'atropine', name: 'Atropine Antidote (OP Poison)', key: 'atropine', icon: '🧪', urgency: 1 },
+  { id: 'mannitol', name: 'IV Mannitol 20% (Neuro Decompress)', key: 'mannitol', icon: '💧', urgency: 1 },
+  { id: 'blood', name: 'O-Negative Packed RBCs', key: 'packed_rbcs', icon: '🩸', urgency: 1 },
+  { id: 'salbutamol', name: 'Inhaled Salbutamol & Ipratropium', key: 'salbutamol', icon: '💨', urgency: 2 },
+  { id: 'tranexamic', name: 'Tranexamic Acid (Hemostatic)', key: 'tranexamic_acid', icon: '🩹', urgency: 1 },
+  { id: 'rabies', name: 'Anti-Rabies & Tetanus Serum', key: 'rabies_serum', icon: '🛡️', urgency: 2 },
+  { id: 'adrenaline', name: 'Adrenaline / Epinephrine 1:1000', key: 'adrenaline', icon: '⚡', urgency: 1 },
+  { id: 'oxytocin', name: 'Oxytocin / PPH Hemorrhage Control', key: 'oxytocin', icon: '🍼', urgency: 1 },
 ];
+
 
 import { MUMBAI_MMR_HOSPITALS, MUMBAI_HOSPITAL_COORDINATES } from '../../data/mumbaiHospitals';
 
@@ -234,13 +233,21 @@ export function PatientPortal({
     })
     .sort((a, b) => a.distKm - b.distKm);
 
-  const filteredSpecialists = SPECIALIST_LIST
-    .map((s) => {
-      const targetId = s.targetHospitalId ?? 0;
-      const coord = MUMBAI_HOSPITAL_COORDINATES[targetId] || { lat: 19.2125, lng: 73.0933 };
-      const dist = calculateDistanceKm(curLat, curLng, coord.lat, coord.lng);
-      const eta = Math.max(3, Math.round(dist * 2.1));
-      return { ...s, distKm: dist, etaMin: eta };
+  const filteredSpecialists = SPECIALIST_DEFINITIONS
+    .map((def) => {
+      const matchingHosp = filteredHospitals.find((h) => h.specialties?.includes(def.specialty)) || filteredHospitals[0] || activeHospitalList[0];
+      const targetHospitalId = matchingHosp ? matchingHosp.id : 0;
+      const facilityName = matchingHosp ? matchingHosp.name : 'Nearest Super-Specialty';
+      const distKm = matchingHosp ? (matchingHosp as any).distKm : 2.4;
+      const etaMin = matchingHosp ? (matchingHosp as any).etaMin : 5;
+
+      return {
+        ...def,
+        facility: facilityName,
+        targetHospitalId,
+        distKm,
+        etaMin,
+      };
     })
     .filter((s) =>
       s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -248,19 +255,35 @@ export function PatientPortal({
     )
     .sort((a, b) => a.distKm - b.distKm);
 
-  const filteredMedicines = CRITICAL_MEDICINES
-    .map((m) => {
-      const targetId = m.targetHospitalId ?? 0;
-      const coord = MUMBAI_HOSPITAL_COORDINATES[targetId] || { lat: 19.2125, lng: 73.0933 };
-      const dist = calculateDistanceKm(curLat, curLng, coord.lat, coord.lng);
-      const eta = Math.max(3, Math.round(dist * 2.1));
-      return { ...m, distKm: dist, etaMin: eta };
+  const filteredMedicines = MEDICINE_DEFINITIONS
+    .map((def) => {
+      const matchingHosp = filteredHospitals.find((h) => {
+        const stock = h.medicineStock || (h as any).medicineStock;
+        return stock && stock[def.key] && stock[def.key] > 0;
+      }) || filteredHospitals[0] || activeHospitalList[0];
+
+      const targetHospitalId = matchingHosp ? matchingHosp.id : 0;
+      const hospName = matchingHosp ? matchingHosp.name : 'Nearest Hospital Pharmacy';
+      const stockQty = matchingHosp?.medicineStock?.[def.key] ?? 24;
+      const stockText = `${stockQty} Units Ready`;
+      const distKm = matchingHosp ? (matchingHosp as any).distKm : 2.4;
+      const etaMin = matchingHosp ? (matchingHosp as any).etaMin : 5;
+
+      return {
+        ...def,
+        hospital: hospName,
+        stock: stockText,
+        targetHospitalId,
+        distKm,
+        etaMin,
+      };
     })
     .filter((m) =>
       m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       m.hospital.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .sort((a, b) => a.distKm - b.distKm);
+
 
   const triageOptionsWithDistance = TRIAGE_OPTIONS.map((opt) => {
     const targetId = opt.targetHospitalId ?? 0;

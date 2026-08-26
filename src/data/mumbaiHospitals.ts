@@ -28,13 +28,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 73.0933,
     "tier": "DH",
     "bedsTotal": 180,
-    "bedsAvailable": 14,
+    "bedsAvailable": 21,
     "specialties": [
-      "cardiology",
       "emergency",
-      "orthopedics",
-      "neurology"
-    ]
+      "cardiology",
+      "general",
+      "pediatrics",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 28,
+      "streptokinase": 28,
+      "atropine": 47,
+      "mannitol": 33,
+      "packed_rbcs": 22,
+      "salbutamol": 28,
+      "tranexamic_acid": 22,
+      "rabies_serum": 34,
+      "adrenaline": 17,
+      "dextrose_25": 14,
+      "magnesium_sulfate": 14,
+      "oxytocin": 21
+    }
   },
   {
     "id": 1,
@@ -47,13 +62,29 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 73.0782,
     "tier": "CHC",
     "bedsTotal": 120,
-    "bedsAvailable": 15,
+    "bedsAvailable": 19,
     "specialties": [
       "emergency",
-      "obstetrics",
       "general",
-      "pediatrics"
-    ]
+      "orthopedics",
+      "obstetrics",
+      "pediatrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 14,
+      "streptokinase": 23,
+      "atropine": 8,
+      "mannitol": 26,
+      "packed_rbcs": 15,
+      "tranexamic_acid": 9,
+      "rabies_serum": 10,
+      "adrenaline": 9,
+      "dextrose_25": 17,
+      "magnesium_sulfate": 11,
+      "oxytocin": 21,
+      "salbutamol": 33
+    }
   },
   {
     "id": 2,
@@ -66,12 +97,29 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 73.089,
     "tier": "DH",
     "bedsTotal": 110,
-    "bedsAvailable": 12,
+    "bedsAvailable": 22,
     "specialties": [
+      "emergency",
       "cardiology",
-      "neurology",
-      "orthopedics"
-    ]
+      "general",
+      "orthopedics",
+      "obstetrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 23,
+      "streptokinase": 17,
+      "atropine": 18,
+      "mannitol": 22,
+      "packed_rbcs": 31,
+      "salbutamol": 16,
+      "tranexamic_acid": 40,
+      "rabies_serum": 27,
+      "adrenaline": 26,
+      "dextrose_25": 28,
+      "magnesium_sulfate": 21,
+      "oxytocin": 23
+    }
   },
   {
     "id": 3,
@@ -84,13 +132,29 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 73.091,
     "tier": "DH",
     "bedsTotal": 100,
-    "bedsAvailable": 9,
+    "bedsAvailable": 14,
     "specialties": [
       "emergency",
+      "cardiology",
       "orthopedics",
       "obstetrics",
-      "pediatrics"
-    ]
+      "pediatrics",
+      "neurology",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 20,
+      "streptokinase": 30,
+      "atropine": 22,
+      "mannitol": 34,
+      "packed_rbcs": 35,
+      "salbutamol": 28,
+      "tranexamic_acid": 31,
+      "rabies_serum": 23,
+      "adrenaline": 12,
+      "dextrose_25": 35,
+      "magnesium_sulfate": 43
+    }
   },
   {
     "id": 4,
@@ -103,14 +167,29 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 73.1498,
     "tier": "DH",
     "bedsTotal": 250,
-    "bedsAvailable": 24,
+    "bedsAvailable": 25,
     "specialties": [
-      "cardiology",
-      "neurology",
-      "orthopedics",
       "emergency",
-      "obstetrics"
-    ]
+      "cardiology",
+      "orthopedics",
+      "obstetrics",
+      "pediatrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "streptokinase": 33,
+      "atropine": 30,
+      "mannitol": 38,
+      "salbutamol": 39,
+      "tranexamic_acid": 41,
+      "rabies_serum": 21,
+      "adrenaline": 20,
+      "dextrose_25": 34,
+      "magnesium_sulfate": 42,
+      "oxytocin": 28,
+      "antivenom": 15,
+      "packed_rbcs": 12
+    }
   },
   {
     "id": 5,
@@ -123,13 +202,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.8335,
     "tier": "DH",
     "bedsTotal": 500,
-    "bedsAvailable": 42,
+    "bedsAvailable": 69,
     "specialties": [
       "emergency",
+      "cardiology",
       "general",
-      "orthopedics",
-      "cardiology"
-    ]
+      "obstetrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 15,
+      "streptokinase": 19,
+      "atropine": 29,
+      "mannitol": 23,
+      "packed_rbcs": 43,
+      "tranexamic_acid": 44,
+      "rabies_serum": 44,
+      "adrenaline": 24,
+      "dextrose_25": 22,
+      "magnesium_sulfate": 41,
+      "oxytocin": 17,
+      "salbutamol": 37
+    }
   },
   {
     "id": 6,
@@ -142,15 +236,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.8337,
     "tier": "DH",
     "bedsTotal": 1350,
-    "bedsAvailable": 88,
+    "bedsAvailable": 219,
     "specialties": [
       "emergency",
       "cardiology",
-      "neurology",
+      "general",
       "orthopedics",
       "obstetrics",
-      "pediatrics"
-    ]
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 13,
+      "streptokinase": 32,
+      "atropine": 32,
+      "mannitol": 36,
+      "packed_rbcs": 47,
+      "salbutamol": 29,
+      "tranexamic_acid": 39,
+      "rabies_serum": 12,
+      "adrenaline": 42,
+      "magnesium_sulfate": 19,
+      "oxytocin": 22
+    }
   },
   {
     "id": 7,
@@ -163,15 +270,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.8427,
     "tier": "DH",
     "bedsTotal": 1800,
-    "bedsAvailable": 112,
+    "bedsAvailable": 393,
     "specialties": [
       "emergency",
       "cardiology",
-      "neurology",
-      "orthopedics",
+      "general",
       "pediatrics",
       "ophthalmology"
-    ]
+    ],
+    "medicineStock": {
+      "antivenom": 46,
+      "streptokinase": 44,
+      "atropine": 36,
+      "mannitol": 12,
+      "packed_rbcs": 15,
+      "salbutamol": 42,
+      "tranexamic_acid": 30,
+      "rabies_serum": 45,
+      "adrenaline": 29,
+      "dextrose_25": 27,
+      "magnesium_sulfate": 21,
+      "oxytocin": 29
+    }
   },
   {
     "id": 8,
@@ -184,12 +304,25 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.825,
     "tier": "CHC",
     "bedsTotal": 120,
-    "bedsAvailable": 18,
+    "bedsAvailable": 20,
     "specialties": [
       "emergency",
       "general",
+      "orthopedics",
       "pediatrics"
-    ]
+    ],
+    "medicineStock": {
+      "antivenom": 25,
+      "streptokinase": 11,
+      "atropine": 22,
+      "mannitol": 13,
+      "salbutamol": 11,
+      "tranexamic_acid": 27,
+      "rabies_serum": 26,
+      "adrenaline": 16,
+      "dextrose_25": 14,
+      "magnesium_sulfate": 27
+    }
   },
   {
     "id": 9,
@@ -202,13 +335,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.8188,
     "tier": "DH",
     "bedsTotal": 250,
-    "bedsAvailable": 24,
+    "bedsAvailable": 40,
     "specialties": [
       "emergency",
       "cardiology",
       "orthopedics",
+      "obstetrics",
       "neurology"
-    ]
+    ],
+    "medicineStock": {
+      "streptokinase": 20,
+      "atropine": 12,
+      "mannitol": 46,
+      "packed_rbcs": 12,
+      "salbutamol": 35,
+      "tranexamic_acid": 34,
+      "rabies_serum": 30,
+      "adrenaline": 14,
+      "dextrose_25": 25,
+      "magnesium_sulfate": 35,
+      "oxytocin": 19,
+      "antivenom": 24
+    }
   },
   {
     "id": 10,
@@ -221,12 +369,29 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.8378,
     "tier": "DH",
     "bedsTotal": 460,
-    "bedsAvailable": 35,
+    "bedsAvailable": 72,
     "specialties": [
       "emergency",
-      "general",
-      "orthopedics"
-    ]
+      "cardiology",
+      "orthopedics",
+      "obstetrics",
+      "pediatrics",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 39,
+      "streptokinase": 46,
+      "atropine": 46,
+      "mannitol": 13,
+      "packed_rbcs": 28,
+      "salbutamol": 42,
+      "tranexamic_acid": 39,
+      "rabies_serum": 34,
+      "adrenaline": 23,
+      "dextrose_25": 12,
+      "magnesium_sulfate": 14,
+      "oxytocin": 33
+    }
   },
   {
     "id": 11,
@@ -239,13 +404,29 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.834,
     "tier": "DH",
     "bedsTotal": 430,
-    "bedsAvailable": 31,
+    "bedsAvailable": 82,
     "specialties": [
       "emergency",
+      "cardiology",
+      "general",
       "orthopedics",
       "obstetrics",
-      "cardiology"
-    ]
+      "pediatrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 36,
+      "streptokinase": 23,
+      "atropine": 14,
+      "packed_rbcs": 43,
+      "salbutamol": 32,
+      "tranexamic_acid": 12,
+      "rabies_serum": 46,
+      "adrenaline": 33,
+      "magnesium_sulfate": 19,
+      "oxytocin": 36,
+      "mannitol": 33
+    }
   },
   {
     "id": 12,
@@ -258,13 +439,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.8436,
     "tier": "DH",
     "bedsTotal": 350,
-    "bedsAvailable": 28,
+    "bedsAvailable": 68,
     "specialties": [
       "emergency",
+      "cardiology",
       "general",
+      "obstetrics",
       "pediatrics",
-      "orthopedics"
-    ]
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 34,
+      "streptokinase": 35,
+      "atropine": 17,
+      "mannitol": 38,
+      "packed_rbcs": 36,
+      "salbutamol": 31,
+      "tranexamic_acid": 21,
+      "rabies_serum": 26,
+      "adrenaline": 32,
+      "dextrose_25": 27,
+      "magnesium_sulfate": 21
+    }
   },
   {
     "id": 13,
@@ -277,14 +473,30 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.8368,
     "tier": "DH",
     "bedsTotal": 650,
-    "bedsAvailable": 52,
+    "bedsAvailable": 62,
     "specialties": [
       "emergency",
       "cardiology",
-      "neurology",
+      "general",
       "orthopedics",
-      "obstetrics"
-    ]
+      "obstetrics",
+      "neurology",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "streptokinase": 41,
+      "atropine": 47,
+      "mannitol": 42,
+      "packed_rbcs": 41,
+      "salbutamol": 15,
+      "tranexamic_acid": 25,
+      "rabies_serum": 23,
+      "adrenaline": 36,
+      "dextrose_25": 41,
+      "magnesium_sulfate": 46,
+      "oxytocin": 16,
+      "antivenom": 28
+    }
   },
   {
     "id": 14,
@@ -297,13 +509,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.8286,
     "tier": "DH",
     "bedsTotal": 300,
-    "bedsAvailable": 22,
+    "bedsAvailable": 40,
     "specialties": [
       "emergency",
       "cardiology",
-      "neurology",
-      "orthopedics"
-    ]
+      "general",
+      "pediatrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 29,
+      "streptokinase": 24,
+      "mannitol": 23,
+      "packed_rbcs": 40,
+      "salbutamol": 43,
+      "tranexamic_acid": 14,
+      "rabies_serum": 12,
+      "adrenaline": 38,
+      "dextrose_25": 30,
+      "magnesium_sulfate": 24,
+      "oxytocin": 20,
+      "atropine": 37
+    }
   },
   {
     "id": 15,
@@ -316,14 +543,29 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.908,
     "tier": "DH",
     "bedsTotal": 550,
-    "bedsAvailable": 44,
+    "bedsAvailable": 96,
     "specialties": [
       "emergency",
       "cardiology",
+      "general",
       "orthopedics",
       "pediatrics",
-      "obstetrics"
-    ]
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 26,
+      "streptokinase": 37,
+      "atropine": 28,
+      "mannitol": 40,
+      "packed_rbcs": 12,
+      "salbutamol": 32,
+      "tranexamic_acid": 30,
+      "rabies_serum": 15,
+      "adrenaline": 26,
+      "dextrose_25": 12,
+      "magnesium_sulfate": 14,
+      "oxytocin": 38
+    }
   },
   {
     "id": 16,
@@ -336,12 +578,27 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.9612,
     "tier": "CHC",
     "bedsTotal": 180,
-    "bedsAvailable": 19,
+    "bedsAvailable": 20,
     "specialties": [
       "emergency",
-      "general",
-      "pediatrics"
-    ]
+      "obstetrics",
+      "ophthalmology",
+      "cardiology"
+    ],
+    "medicineStock": {
+      "antivenom": 11,
+      "streptokinase": 24,
+      "atropine": 10,
+      "mannitol": 22,
+      "packed_rbcs": 15,
+      "tranexamic_acid": 11,
+      "rabies_serum": 27,
+      "dextrose_25": 26,
+      "magnesium_sulfate": 8,
+      "oxytocin": 16,
+      "salbutamol": 48,
+      "adrenaline": 34
+    }
   },
   {
     "id": 17,
@@ -354,13 +611,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.848,
     "tier": "DH",
     "bedsTotal": 300,
-    "bedsAvailable": 26,
+    "bedsAvailable": 76,
     "specialties": [
       "emergency",
-      "obstetrics",
+      "cardiology",
       "orthopedics",
-      "general"
-    ]
+      "obstetrics",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 21,
+      "streptokinase": 26,
+      "atropine": 34,
+      "mannitol": 29,
+      "packed_rbcs": 21,
+      "salbutamol": 21,
+      "tranexamic_acid": 12,
+      "rabies_serum": 44,
+      "adrenaline": 35,
+      "dextrose_25": 26,
+      "magnesium_sulfate": 21,
+      "oxytocin": 41
+    }
   },
   {
     "id": 18,
@@ -373,13 +645,29 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 73.153,
     "tier": "DH",
     "bedsTotal": 250,
-    "bedsAvailable": 22,
+    "bedsAvailable": 28,
     "specialties": [
       "emergency",
+      "cardiology",
       "general",
       "orthopedics",
+      "obstetrics",
       "pediatrics"
-    ]
+    ],
+    "medicineStock": {
+      "antivenom": 18,
+      "streptokinase": 39,
+      "atropine": 38,
+      "mannitol": 41,
+      "packed_rbcs": 25,
+      "tranexamic_acid": 41,
+      "rabies_serum": 37,
+      "adrenaline": 44,
+      "dextrose_25": 22,
+      "magnesium_sulfate": 44,
+      "oxytocin": 37,
+      "salbutamol": 50
+    }
   },
   {
     "id": 19,
@@ -392,14 +680,29 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.9984,
     "tier": "DH",
     "bedsTotal": 500,
-    "bedsAvailable": 48,
+    "bedsAvailable": 76,
     "specialties": [
       "emergency",
       "cardiology",
-      "neurology",
+      "general",
       "orthopedics",
-      "obstetrics"
-    ]
+      "obstetrics",
+      "pediatrics"
+    ],
+    "medicineStock": {
+      "antivenom": 16,
+      "streptokinase": 16,
+      "atropine": 41,
+      "mannitol": 18,
+      "packed_rbcs": 29,
+      "salbutamol": 45,
+      "tranexamic_acid": 30,
+      "rabies_serum": 36,
+      "dextrose_25": 47,
+      "magnesium_sulfate": 22,
+      "oxytocin": 41,
+      "adrenaline": 37
+    }
   },
   {
     "id": 20,
@@ -412,13 +715,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.9754,
     "tier": "DH",
     "bedsTotal": 400,
-    "bedsAvailable": 36,
+    "bedsAvailable": 97,
     "specialties": [
       "emergency",
+      "cardiology",
       "general",
       "orthopedics",
-      "pediatrics"
-    ]
+      "obstetrics",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 13,
+      "streptokinase": 28,
+      "atropine": 45,
+      "mannitol": 30,
+      "packed_rbcs": 33,
+      "salbutamol": 21,
+      "tranexamic_acid": 21,
+      "rabies_serum": 33,
+      "dextrose_25": 36,
+      "oxytocin": 14,
+      "adrenaline": 39
+    }
   },
   {
     "id": 21,
@@ -431,12 +749,27 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.855,
     "tier": "CHC",
     "bedsTotal": 200,
-    "bedsAvailable": 18,
+    "bedsAvailable": 46,
     "specialties": [
       "emergency",
-      "obstetrics",
-      "general"
-    ]
+      "general",
+      "pediatrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 27,
+      "streptokinase": 23,
+      "atropine": 6,
+      "mannitol": 24,
+      "packed_rbcs": 21,
+      "salbutamol": 19,
+      "rabies_serum": 22,
+      "adrenaline": 6,
+      "dextrose_25": 14,
+      "magnesium_sulfate": 7,
+      "oxytocin": 7,
+      "tranexamic_acid": 38
+    }
   },
   {
     "id": 22,
@@ -452,9 +785,25 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "bedsAvailable": 20,
     "specialties": [
       "emergency",
-      "general",
-      "orthopedics"
-    ]
+      "cardiology",
+      "orthopedics",
+      "pediatrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 44,
+      "streptokinase": 17,
+      "atropine": 16,
+      "packed_rbcs": 32,
+      "salbutamol": 13,
+      "rabies_serum": 39,
+      "adrenaline": 25,
+      "dextrose_25": 38,
+      "magnesium_sulfate": 25,
+      "oxytocin": 21,
+      "tranexamic_acid": 22,
+      "mannitol": 35
+    }
   },
   {
     "id": 23,
@@ -467,12 +816,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.8777,
     "tier": "DH",
     "bedsTotal": 200,
-    "bedsAvailable": 20,
+    "bedsAvailable": 48,
     "specialties": [
       "emergency",
-      "general",
+      "cardiology",
+      "neurology",
+      "ophthalmology",
       "orthopedics"
-    ]
+    ],
+    "medicineStock": {
+      "antivenom": 27,
+      "streptokinase": 31,
+      "mannitol": 22,
+      "packed_rbcs": 30,
+      "salbutamol": 22,
+      "tranexamic_acid": 24,
+      "rabies_serum": 32,
+      "adrenaline": 43,
+      "dextrose_25": 12,
+      "magnesium_sulfate": 44,
+      "oxytocin": 30,
+      "atropine": 33
+    }
   },
   {
     "id": 24,
@@ -489,9 +854,24 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "specialties": [
       "emergency",
       "cardiology",
+      "general",
       "orthopedics",
-      "pediatrics"
-    ]
+      "obstetrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 39,
+      "atropine": 24,
+      "mannitol": 43,
+      "packed_rbcs": 29,
+      "salbutamol": 32,
+      "tranexamic_acid": 44,
+      "rabies_serum": 39,
+      "adrenaline": 18,
+      "magnesium_sulfate": 39,
+      "oxytocin": 28,
+      "streptokinase": 16
+    }
   },
   {
     "id": 25,
@@ -504,12 +884,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 73.1302,
     "tier": "CHC",
     "bedsTotal": 150,
-    "bedsAvailable": 14,
+    "bedsAvailable": 31,
     "specialties": [
       "emergency",
       "general",
-      "orthopedics"
-    ]
+      "orthopedics",
+      "obstetrics",
+      "pediatrics"
+    ],
+    "medicineStock": {
+      "antivenom": 21,
+      "streptokinase": 10,
+      "atropine": 15,
+      "mannitol": 11,
+      "packed_rbcs": 9,
+      "salbutamol": 27,
+      "tranexamic_acid": 27,
+      "rabies_serum": 7,
+      "adrenaline": 18,
+      "dextrose_25": 27,
+      "magnesium_sulfate": 7,
+      "oxytocin": 7
+    }
   },
   {
     "id": 26,
@@ -522,13 +918,30 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 73.042,
     "tier": "DH",
     "bedsTotal": 350,
-    "bedsAvailable": 28,
+    "bedsAvailable": 87,
     "specialties": [
       "emergency",
       "cardiology",
-      "neurology",
-      "orthopedics"
-    ]
+      "general",
+      "orthopedics",
+      "obstetrics",
+      "pediatrics",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 34,
+      "atropine": 20,
+      "mannitol": 40,
+      "packed_rbcs": 27,
+      "salbutamol": 15,
+      "tranexamic_acid": 22,
+      "rabies_serum": 16,
+      "dextrose_25": 18,
+      "magnesium_sulfate": 18,
+      "oxytocin": 36,
+      "adrenaline": 33,
+      "streptokinase": 11
+    }
   },
   {
     "id": 27,
@@ -541,12 +954,29 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 73.007,
     "tier": "DH",
     "bedsTotal": 150,
-    "bedsAvailable": 14,
+    "bedsAvailable": 16,
     "specialties": [
       "emergency",
+      "cardiology",
+      "general",
       "orthopedics",
-      "cardiology"
-    ]
+      "obstetrics",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 32,
+      "streptokinase": 44,
+      "atropine": 33,
+      "mannitol": 45,
+      "packed_rbcs": 26,
+      "salbutamol": 36,
+      "rabies_serum": 41,
+      "adrenaline": 22,
+      "dextrose_25": 31,
+      "magnesium_sulfate": 27,
+      "oxytocin": 40,
+      "tranexamic_acid": 20
+    }
   },
   {
     "id": 28,
@@ -559,12 +989,26 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.995,
     "tier": "CHC",
     "bedsTotal": 100,
-    "bedsAvailable": 12,
+    "bedsAvailable": 24,
     "specialties": [
       "emergency",
-      "pediatrics",
-      "obstetrics"
-    ]
+      "general",
+      "orthopedics",
+      "obstetrics",
+      "pediatrics"
+    ],
+    "medicineStock": {
+      "antivenom": 16,
+      "atropine": 8,
+      "mannitol": 21,
+      "packed_rbcs": 14,
+      "salbutamol": 20,
+      "tranexamic_acid": 20,
+      "rabies_serum": 16,
+      "adrenaline": 13,
+      "dextrose_25": 10,
+      "magnesium_sulfate": 24
+    }
   },
   {
     "id": 29,
@@ -577,12 +1021,26 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 73.008,
     "tier": "CHC",
     "bedsTotal": 80,
-    "bedsAvailable": 9,
+    "bedsAvailable": 15,
     "specialties": [
       "emergency",
-      "general",
-      "orthopedics"
-    ]
+      "orthopedics",
+      "pediatrics",
+      "general"
+    ],
+    "medicineStock": {
+      "antivenom": 13,
+      "streptokinase": 7,
+      "atropine": 9,
+      "mannitol": 13,
+      "packed_rbcs": 15,
+      "salbutamol": 13,
+      "rabies_serum": 20,
+      "adrenaline": 6,
+      "magnesium_sulfate": 10,
+      "oxytocin": 6,
+      "tranexamic_acid": 22
+    }
   },
   {
     "id": 30,
@@ -595,11 +1053,23 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 73.001,
     "tier": "PHC",
     "bedsTotal": 60,
-    "bedsAvailable": 8,
+    "bedsAvailable": 11,
     "specialties": [
       "emergency",
-      "general"
-    ]
+      "pediatrics",
+      "neurology",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "streptokinase": 13,
+      "mannitol": 14,
+      "packed_rbcs": 15,
+      "salbutamol": 12,
+      "tranexamic_acid": 11,
+      "rabies_serum": 12,
+      "dextrose_25": 8,
+      "magnesium_sulfate": 10
+    }
   },
   {
     "id": 31,
@@ -612,13 +1082,29 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 73.003,
     "tier": "DH",
     "bedsTotal": 400,
-    "bedsAvailable": 32,
+    "bedsAvailable": 35,
     "specialties": [
       "emergency",
       "cardiology",
-      "neurology",
-      "orthopedics"
-    ]
+      "general",
+      "orthopedics",
+      "obstetrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 22,
+      "streptokinase": 23,
+      "packed_rbcs": 23,
+      "salbutamol": 43,
+      "rabies_serum": 37,
+      "adrenaline": 30,
+      "dextrose_25": 29,
+      "magnesium_sulfate": 22,
+      "oxytocin": 12,
+      "atropine": 36,
+      "tranexamic_acid": 23,
+      "mannitol": 21
+    }
   },
   {
     "id": 32,
@@ -631,12 +1117,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 73.018,
     "tier": "DH",
     "bedsTotal": 300,
-    "bedsAvailable": 26,
+    "bedsAvailable": 39,
     "specialties": [
       "emergency",
+      "cardiology",
+      "general",
+      "obstetrics",
       "pediatrics",
-      "orthopedics"
-    ]
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 19,
+      "streptokinase": 35,
+      "atropine": 15,
+      "mannitol": 36,
+      "packed_rbcs": 47,
+      "salbutamol": 25,
+      "tranexamic_acid": 20,
+      "rabies_serum": 24,
+      "adrenaline": 44,
+      "magnesium_sulfate": 26,
+      "oxytocin": 25
+    }
   },
   {
     "id": 33,
@@ -649,12 +1151,29 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.998,
     "tier": "CHC",
     "bedsTotal": 150,
-    "bedsAvailable": 16,
+    "bedsAvailable": 20,
     "specialties": [
       "emergency",
       "general",
-      "pediatrics"
-    ]
+      "orthopedics",
+      "obstetrics",
+      "pediatrics",
+      "neurology",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 9,
+      "streptokinase": 6,
+      "mannitol": 27,
+      "packed_rbcs": 11,
+      "salbutamol": 16,
+      "tranexamic_acid": 7,
+      "dextrose_25": 18,
+      "magnesium_sulfate": 21,
+      "oxytocin": 23,
+      "atropine": 41,
+      "adrenaline": 29
+    }
   },
   {
     "id": 34,
@@ -667,12 +1186,30 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 73.001,
     "tier": "DH",
     "bedsTotal": 250,
-    "bedsAvailable": 20,
+    "bedsAvailable": 51,
     "specialties": [
       "emergency",
+      "cardiology",
       "general",
-      "orthopedics"
-    ]
+      "orthopedics",
+      "obstetrics",
+      "neurology",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 14,
+      "streptokinase": 25,
+      "atropine": 22,
+      "mannitol": 25,
+      "packed_rbcs": 19,
+      "salbutamol": 14,
+      "tranexamic_acid": 38,
+      "rabies_serum": 17,
+      "adrenaline": 16,
+      "dextrose_25": 38,
+      "magnesium_sulfate": 28,
+      "oxytocin": 24
+    }
   },
   {
     "id": 35,
@@ -685,12 +1222,24 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 73.02,
     "tier": "PHC",
     "bedsTotal": 50,
-    "bedsAvailable": 6,
+    "bedsAvailable": 10,
     "specialties": [
-      "obstetrics",
-      "pediatrics",
-      "general"
-    ]
+      "emergency",
+      "orthopedics",
+      "obstetrics"
+    ],
+    "medicineStock": {
+      "antivenom": 15,
+      "streptokinase": 12,
+      "mannitol": 14,
+      "salbutamol": 7,
+      "tranexamic_acid": 8,
+      "rabies_serum": 9,
+      "adrenaline": 3,
+      "dextrose_25": 12,
+      "magnesium_sulfate": 15,
+      "oxytocin": 3
+    }
   },
   {
     "id": 36,
@@ -703,12 +1252,21 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 73.012,
     "tier": "PHC",
     "bedsTotal": 50,
-    "bedsAvailable": 7,
+    "bedsAvailable": 5,
     "specialties": [
-      "obstetrics",
-      "pediatrics",
-      "general"
-    ]
+      "emergency",
+      "orthopedics",
+      "pediatrics"
+    ],
+    "medicineStock": {
+      "antivenom": 15,
+      "streptokinase": 3,
+      "atropine": 9,
+      "mannitol": 3,
+      "packed_rbcs": 8,
+      "rabies_serum": 6,
+      "magnesium_sulfate": 7
+    }
   },
   {
     "id": 37,
@@ -721,13 +1279,27 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.855,
     "tier": "DH",
     "bedsTotal": 400,
-    "bedsAvailable": 48,
+    "bedsAvailable": 64,
     "specialties": [
       "emergency",
+      "cardiology",
       "general",
-      "orthopedics",
-      "pediatrics"
-    ]
+      "pediatrics",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 42,
+      "streptokinase": 26,
+      "atropine": 32,
+      "mannitol": 26,
+      "packed_rbcs": 32,
+      "salbutamol": 14,
+      "tranexamic_acid": 47,
+      "rabies_serum": 42,
+      "adrenaline": 47,
+      "dextrose_25": 23,
+      "magnesium_sulfate": 21
+    }
   },
   {
     "id": 38,
@@ -740,12 +1312,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.852,
     "tier": "DH",
     "bedsTotal": 320,
-    "bedsAvailable": 38,
+    "bedsAvailable": 59,
     "specialties": [
       "emergency",
+      "cardiology",
       "general",
+      "orthopedics",
       "obstetrics"
-    ]
+    ],
+    "medicineStock": {
+      "antivenom": 40,
+      "streptokinase": 39,
+      "atropine": 35,
+      "mannitol": 38,
+      "packed_rbcs": 36,
+      "salbutamol": 27,
+      "tranexamic_acid": 38,
+      "rabies_serum": 38,
+      "adrenaline": 33,
+      "dextrose_25": 30,
+      "magnesium_sulfate": 43,
+      "oxytocin": 29
+    }
   },
   {
     "id": 39,
@@ -758,12 +1346,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.846,
     "tier": "DH",
     "bedsTotal": 120,
-    "bedsAvailable": 14,
+    "bedsAvailable": 26,
     "specialties": [
       "emergency",
       "cardiology",
-      "ophthalmology"
-    ]
+      "general",
+      "obstetrics",
+      "pediatrics"
+    ],
+    "medicineStock": {
+      "streptokinase": 13,
+      "atropine": 29,
+      "mannitol": 38,
+      "packed_rbcs": 13,
+      "salbutamol": 16,
+      "tranexamic_acid": 18,
+      "rabies_serum": 45,
+      "adrenaline": 41,
+      "dextrose_25": 42,
+      "magnesium_sulfate": 17,
+      "oxytocin": 19,
+      "antivenom": 25
+    }
   },
   {
     "id": 40,
@@ -776,13 +1380,31 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.932,
     "tier": "DH",
     "bedsTotal": 260,
-    "bedsAvailable": 31,
+    "bedsAvailable": 21,
     "specialties": [
       "emergency",
       "cardiology",
+      "general",
+      "orthopedics",
+      "obstetrics",
+      "pediatrics",
       "neurology",
-      "orthopedics"
-    ]
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 35,
+      "streptokinase": 28,
+      "atropine": 42,
+      "mannitol": 27,
+      "packed_rbcs": 44,
+      "salbutamol": 15,
+      "tranexamic_acid": 20,
+      "rabies_serum": 31,
+      "adrenaline": 41,
+      "dextrose_25": 45,
+      "magnesium_sulfate": 14,
+      "oxytocin": 31
+    }
   },
   {
     "id": 41,
@@ -799,8 +1421,25 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "specialties": [
       "emergency",
       "cardiology",
-      "orthopedics"
-    ]
+      "general",
+      "obstetrics",
+      "pediatrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 32,
+      "atropine": 25,
+      "packed_rbcs": 40,
+      "tranexamic_acid": 35,
+      "rabies_serum": 31,
+      "dextrose_25": 27,
+      "magnesium_sulfate": 27,
+      "oxytocin": 16,
+      "salbutamol": 52,
+      "adrenaline": 33,
+      "streptokinase": 16,
+      "mannitol": 27
+    }
   },
   {
     "id": 42,
@@ -813,12 +1452,26 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.845,
     "tier": "CHC",
     "bedsTotal": 80,
-    "bedsAvailable": 10,
+    "bedsAvailable": 15,
     "specialties": [
       "emergency",
-      "general",
-      "pediatrics"
-    ]
+      "orthopedics",
+      "obstetrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 17,
+      "streptokinase": 9,
+      "atropine": 7,
+      "mannitol": 8,
+      "salbutamol": 15,
+      "tranexamic_acid": 11,
+      "rabies_serum": 27,
+      "adrenaline": 27,
+      "dextrose_25": 26,
+      "magnesium_sulfate": 12,
+      "oxytocin": 18
+    }
   },
   {
     "id": 43,
@@ -831,11 +1484,27 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.839,
     "tier": "PHC",
     "bedsTotal": 40,
-    "bedsAvailable": 5,
+    "bedsAvailable": 8,
     "specialties": [
-      "general",
-      "emergency"
-    ]
+      "emergency",
+      "orthopedics",
+      "obstetrics",
+      "pediatrics",
+      "neurology",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 8,
+      "atropine": 6,
+      "mannitol": 10,
+      "packed_rbcs": 15,
+      "salbutamol": 5,
+      "tranexamic_acid": 14,
+      "rabies_serum": 11,
+      "adrenaline": 15,
+      "dextrose_25": 11,
+      "magnesium_sulfate": 12
+    }
   },
   {
     "id": 44,
@@ -848,12 +1517,30 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.909,
     "tier": "DH",
     "bedsTotal": 100,
-    "bedsAvailable": 12,
+    "bedsAvailable": 24,
     "specialties": [
       "emergency",
       "cardiology",
-      "orthopedics"
-    ]
+      "general",
+      "orthopedics",
+      "pediatrics",
+      "neurology",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 25,
+      "streptokinase": 43,
+      "atropine": 20,
+      "mannitol": 41,
+      "packed_rbcs": 24,
+      "tranexamic_acid": 33,
+      "rabies_serum": 23,
+      "adrenaline": 13,
+      "dextrose_25": 23,
+      "magnesium_sulfate": 15,
+      "oxytocin": 41,
+      "salbutamol": 45
+    }
   },
   {
     "id": 45,
@@ -866,10 +1553,22 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.851,
     "tier": "PHC",
     "bedsTotal": 35,
-    "bedsAvailable": 4,
+    "bedsAvailable": 5,
     "specialties": [
-      "general"
-    ]
+      "emergency",
+      "general",
+      "orthopedics"
+    ],
+    "medicineStock": {
+      "antivenom": 6,
+      "atropine": 4,
+      "mannitol": 9,
+      "packed_rbcs": 14,
+      "salbutamol": 12,
+      "rabies_serum": 15,
+      "dextrose_25": 4,
+      "oxytocin": 14
+    }
   },
   {
     "id": 46,
@@ -882,12 +1581,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.848,
     "tier": "DH",
     "bedsTotal": 110,
-    "bedsAvailable": 13,
+    "bedsAvailable": 18,
     "specialties": [
       "emergency",
       "cardiology",
-      "neurology"
-    ]
+      "general",
+      "obstetrics",
+      "pediatrics"
+    ],
+    "medicineStock": {
+      "antivenom": 14,
+      "streptokinase": 45,
+      "atropine": 42,
+      "mannitol": 30,
+      "packed_rbcs": 46,
+      "salbutamol": 36,
+      "rabies_serum": 30,
+      "adrenaline": 15,
+      "dextrose_25": 36,
+      "magnesium_sulfate": 38,
+      "oxytocin": 31,
+      "tranexamic_acid": 19
+    }
   },
   {
     "id": 47,
@@ -900,15 +1615,30 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.887,
     "tier": "DH",
     "bedsTotal": 1500,
-    "bedsAvailable": 180,
+    "bedsAvailable": 271,
     "specialties": [
       "emergency",
       "cardiology",
-      "neurology",
+      "general",
       "orthopedics",
+      "obstetrics",
       "pediatrics",
-      "obstetrics"
-    ]
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 17,
+      "streptokinase": 45,
+      "atropine": 31,
+      "mannitol": 43,
+      "packed_rbcs": 37,
+      "salbutamol": 29,
+      "tranexamic_acid": 28,
+      "rabies_serum": 41,
+      "adrenaline": 17,
+      "dextrose_25": 22,
+      "magnesium_sulfate": 21,
+      "oxytocin": 39
+    }
   },
   {
     "id": 48,
@@ -923,9 +1653,22 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "bedsTotal": 30,
     "bedsAvailable": 4,
     "specialties": [
+      "emergency",
       "obstetrics",
-      "general"
-    ]
+      "pediatrics"
+    ],
+    "medicineStock": {
+      "streptokinase": 6,
+      "atropine": 15,
+      "mannitol": 14,
+      "packed_rbcs": 13,
+      "tranexamic_acid": 13,
+      "rabies_serum": 5,
+      "adrenaline": 12,
+      "dextrose_25": 12,
+      "magnesium_sulfate": 9,
+      "oxytocin": 14
+    }
   },
   {
     "id": 49,
@@ -938,12 +1681,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.849,
     "tier": "DH",
     "bedsTotal": 100,
-    "bedsAvailable": 12,
+    "bedsAvailable": 8,
     "specialties": [
       "emergency",
+      "cardiology",
       "orthopedics",
-      "cardiology"
-    ]
+      "obstetrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 12,
+      "streptokinase": 34,
+      "atropine": 38,
+      "mannitol": 31,
+      "packed_rbcs": 45,
+      "salbutamol": 18,
+      "tranexamic_acid": 46,
+      "rabies_serum": 34,
+      "adrenaline": 25,
+      "dextrose_25": 36,
+      "magnesium_sulfate": 28,
+      "oxytocin": 42
+    }
   },
   {
     "id": 50,
@@ -956,11 +1715,29 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.857,
     "tier": "CHC",
     "bedsTotal": 60,
-    "bedsAvailable": 7,
+    "bedsAvailable": 14,
     "specialties": [
+      "emergency",
       "general",
-      "emergency"
-    ]
+      "orthopedics",
+      "obstetrics",
+      "pediatrics",
+      "neurology",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 26,
+      "streptokinase": 27,
+      "packed_rbcs": 25,
+      "salbutamol": 7,
+      "tranexamic_acid": 17,
+      "rabies_serum": 21,
+      "adrenaline": 17,
+      "dextrose_25": 27,
+      "magnesium_sulfate": 25,
+      "oxytocin": 7,
+      "atropine": 33
+    }
   },
   {
     "id": 51,
@@ -973,12 +1750,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.818,
     "tier": "CHC",
     "bedsTotal": 120,
-    "bedsAvailable": 14,
+    "bedsAvailable": 29,
     "specialties": [
       "emergency",
       "general",
-      "pediatrics"
-    ]
+      "orthopedics",
+      "pediatrics",
+      "neurology",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 25,
+      "streptokinase": 12,
+      "atropine": 26,
+      "mannitol": 11,
+      "packed_rbcs": 9,
+      "salbutamol": 25,
+      "tranexamic_acid": 16,
+      "rabies_serum": 15,
+      "adrenaline": 19,
+      "dextrose_25": 7,
+      "oxytocin": 20
+    }
   },
   {
     "id": 52,
@@ -991,12 +1784,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.951,
     "tier": "DH",
     "bedsTotal": 220,
-    "bedsAvailable": 26,
+    "bedsAvailable": 43,
     "specialties": [
       "emergency",
+      "cardiology",
       "general",
-      "orthopedics"
-    ]
+      "orthopedics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 40,
+      "streptokinase": 36,
+      "atropine": 12,
+      "mannitol": 33,
+      "packed_rbcs": 22,
+      "salbutamol": 19,
+      "tranexamic_acid": 19,
+      "rabies_serum": 23,
+      "adrenaline": 20,
+      "dextrose_25": 21,
+      "magnesium_sulfate": 21,
+      "oxytocin": 45
+    }
   },
   {
     "id": 53,
@@ -1009,12 +1818,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.822,
     "tier": "DH",
     "bedsTotal": 380,
-    "bedsAvailable": 46,
+    "bedsAvailable": 90,
     "specialties": [
       "emergency",
       "cardiology",
-      "orthopedics"
-    ]
+      "general",
+      "obstetrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 38,
+      "streptokinase": 12,
+      "atropine": 16,
+      "mannitol": 45,
+      "packed_rbcs": 26,
+      "salbutamol": 31,
+      "tranexamic_acid": 46,
+      "rabies_serum": 19,
+      "adrenaline": 42,
+      "dextrose_25": 29,
+      "magnesium_sulfate": 43,
+      "oxytocin": 46
+    }
   },
   {
     "id": 54,
@@ -1027,12 +1852,29 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.831,
     "tier": "DH",
     "bedsTotal": 450,
-    "bedsAvailable": 54,
+    "bedsAvailable": 116,
     "specialties": [
       "emergency",
+      "cardiology",
       "general",
-      "pediatrics"
-    ]
+      "orthopedics",
+      "obstetrics",
+      "pediatrics",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 35,
+      "streptokinase": 25,
+      "atropine": 19,
+      "mannitol": 22,
+      "packed_rbcs": 30,
+      "salbutamol": 44,
+      "tranexamic_acid": 37,
+      "rabies_serum": 15,
+      "adrenaline": 28,
+      "dextrose_25": 36,
+      "magnesium_sulfate": 28
+    }
   },
   {
     "id": 55,
@@ -1045,13 +1887,27 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.918,
     "tier": "DH",
     "bedsTotal": 280,
-    "bedsAvailable": 34,
+    "bedsAvailable": 56,
     "specialties": [
       "emergency",
-      "general",
+      "cardiology",
       "obstetrics",
-      "pediatrics"
-    ]
+      "pediatrics",
+      "general"
+    ],
+    "medicineStock": {
+      "antivenom": 32,
+      "streptokinase": 27,
+      "atropine": 16,
+      "mannitol": 39,
+      "packed_rbcs": 30,
+      "salbutamol": 45,
+      "tranexamic_acid": 26,
+      "rabies_serum": 16,
+      "adrenaline": 23,
+      "dextrose_25": 40,
+      "oxytocin": 24
+    }
   },
   {
     "id": 56,
@@ -1064,11 +1920,26 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.938,
     "tier": "CHC",
     "bedsTotal": 70,
-    "bedsAvailable": 8,
+    "bedsAvailable": 12,
     "specialties": [
       "emergency",
-      "orthopedics"
-    ]
+      "orthopedics",
+      "obstetrics",
+      "general"
+    ],
+    "medicineStock": {
+      "antivenom": 6,
+      "streptokinase": 16,
+      "atropine": 17,
+      "packed_rbcs": 22,
+      "salbutamol": 18,
+      "tranexamic_acid": 10,
+      "rabies_serum": 25,
+      "adrenaline": 21,
+      "dextrose_25": 7,
+      "magnesium_sulfate": 20,
+      "oxytocin": 7
+    }
   },
   {
     "id": 57,
@@ -1081,13 +1952,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.813,
     "tier": "DH",
     "bedsTotal": 210,
-    "bedsAvailable": 25,
+    "bedsAvailable": 20,
     "specialties": [
-      "pediatrics",
+      "emergency",
       "cardiology",
-      "neurology",
-      "emergency"
-    ]
+      "general",
+      "obstetrics",
+      "pediatrics",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "streptokinase": 29,
+      "atropine": 27,
+      "mannitol": 46,
+      "packed_rbcs": 30,
+      "salbutamol": 47,
+      "tranexamic_acid": 29,
+      "adrenaline": 40,
+      "dextrose_25": 23,
+      "magnesium_sulfate": 21,
+      "oxytocin": 21,
+      "antivenom": 22
+    }
   },
   {
     "id": 58,
@@ -1100,12 +1986,26 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.935,
     "tier": "CHC",
     "bedsTotal": 65,
-    "bedsAvailable": 8,
+    "bedsAvailable": 6,
     "specialties": [
       "emergency",
       "general",
-      "obstetrics"
-    ]
+      "orthopedics",
+      "pediatrics"
+    ],
+    "medicineStock": {
+      "antivenom": 14,
+      "atropine": 14,
+      "mannitol": 15,
+      "packed_rbcs": 16,
+      "tranexamic_acid": 11,
+      "rabies_serum": 21,
+      "adrenaline": 21,
+      "dextrose_25": 26,
+      "magnesium_sulfate": 16,
+      "oxytocin": 25,
+      "salbutamol": 39
+    }
   },
   {
     "id": 59,
@@ -1118,10 +2018,27 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.838,
     "tier": "PHC",
     "bedsTotal": 50,
-    "bedsAvailable": 6,
+    "bedsAvailable": 5,
     "specialties": [
-      "general"
-    ]
+      "emergency",
+      "general",
+      "orthopedics",
+      "pediatrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "streptokinase": 8,
+      "atropine": 7,
+      "mannitol": 14,
+      "packed_rbcs": 8,
+      "salbutamol": 9,
+      "tranexamic_acid": 14,
+      "rabies_serum": 9,
+      "adrenaline": 12,
+      "dextrose_25": 12,
+      "magnesium_sulfate": 15,
+      "oxytocin": 10
+    }
   },
   {
     "id": 60,
@@ -1134,12 +2051,29 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.831,
     "tier": "DH",
     "bedsTotal": 150,
-    "bedsAvailable": 18,
+    "bedsAvailable": 23,
     "specialties": [
       "emergency",
       "cardiology",
-      "orthopedics"
-    ]
+      "general",
+      "orthopedics",
+      "neurology",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 20,
+      "streptokinase": 28,
+      "atropine": 40,
+      "mannitol": 25,
+      "packed_rbcs": 19,
+      "salbutamol": 45,
+      "tranexamic_acid": 19,
+      "rabies_serum": 29,
+      "adrenaline": 17,
+      "dextrose_25": 42,
+      "magnesium_sulfate": 14,
+      "oxytocin": 18
+    }
   },
   {
     "id": 61,
@@ -1152,11 +2086,30 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.852,
     "tier": "DH",
     "bedsTotal": 120,
-    "bedsAvailable": 14,
+    "bedsAvailable": 23,
     "specialties": [
       "emergency",
-      "general"
-    ]
+      "cardiology",
+      "orthopedics",
+      "obstetrics",
+      "pediatrics",
+      "neurology",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 18,
+      "streptokinase": 41,
+      "atropine": 43,
+      "mannitol": 37,
+      "packed_rbcs": 23,
+      "salbutamol": 22,
+      "tranexamic_acid": 46,
+      "rabies_serum": 26,
+      "adrenaline": 39,
+      "dextrose_25": 13,
+      "magnesium_sulfate": 36,
+      "oxytocin": 20
+    }
   },
   {
     "id": 62,
@@ -1169,14 +2122,27 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.948,
     "tier": "DH",
     "bedsTotal": 350,
-    "bedsAvailable": 42,
+    "bedsAvailable": 44,
     "specialties": [
-      "cardiology",
-      "neurology",
-      "orthopedics",
       "emergency",
-      "obstetrics"
-    ]
+      "cardiology",
+      "obstetrics",
+      "pediatrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 15,
+      "streptokinase": 18,
+      "atropine": 47,
+      "mannitol": 13,
+      "packed_rbcs": 27,
+      "salbutamol": 34,
+      "tranexamic_acid": 37,
+      "rabies_serum": 22,
+      "adrenaline": 26,
+      "dextrose_25": 20,
+      "magnesium_sulfate": 21
+    }
   },
   {
     "id": 63,
@@ -1189,12 +2155,29 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.858,
     "tier": "DH",
     "bedsTotal": 100,
-    "bedsAvailable": 12,
+    "bedsAvailable": 9,
     "specialties": [
       "emergency",
       "cardiology",
-      "orthopedics"
-    ]
+      "general",
+      "orthopedics",
+      "obstetrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 12,
+      "streptokinase": 30,
+      "atropine": 14,
+      "mannitol": 26,
+      "packed_rbcs": 31,
+      "salbutamol": 46,
+      "tranexamic_acid": 28,
+      "rabies_serum": 18,
+      "adrenaline": 12,
+      "dextrose_25": 27,
+      "magnesium_sulfate": 43,
+      "oxytocin": 22
+    }
   },
   {
     "id": 64,
@@ -1207,11 +2190,24 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.909,
     "tier": "PHC",
     "bedsTotal": 40,
-    "bedsAvailable": 5,
+    "bedsAvailable": 6,
     "specialties": [
+      "emergency",
+      "general",
       "obstetrics",
-      "pediatrics"
-    ]
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 15,
+      "mannitol": 5,
+      "packed_rbcs": 12,
+      "salbutamol": 11,
+      "tranexamic_acid": 6,
+      "rabies_serum": 5,
+      "dextrose_25": 14,
+      "magnesium_sulfate": 5,
+      "oxytocin": 15
+    }
   },
   {
     "id": 65,
@@ -1224,11 +2220,25 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.931,
     "tier": "CHC",
     "bedsTotal": 50,
-    "bedsAvailable": 6,
+    "bedsAvailable": 4,
     "specialties": [
       "emergency",
-      "general"
-    ]
+      "general",
+      "orthopedics",
+      "obstetrics",
+      "pediatrics"
+    ],
+    "medicineStock": {
+      "antivenom": 25,
+      "streptokinase": 10,
+      "mannitol": 19,
+      "packed_rbcs": 11,
+      "salbutamol": 8,
+      "tranexamic_acid": 27,
+      "adrenaline": 27,
+      "magnesium_sulfate": 24,
+      "atropine": 28
+    }
   },
   {
     "id": 66,
@@ -1241,11 +2251,26 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.843,
     "tier": "CHC",
     "bedsTotal": 60,
-    "bedsAvailable": 7,
+    "bedsAvailable": 12,
     "specialties": [
       "emergency",
-      "general"
-    ]
+      "general",
+      "pediatrics",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 21,
+      "streptokinase": 25,
+      "atropine": 7,
+      "mannitol": 11,
+      "rabies_serum": 21,
+      "adrenaline": 25,
+      "dextrose_25": 24,
+      "magnesium_sulfate": 6,
+      "oxytocin": 20,
+      "salbutamol": 37,
+      "tranexamic_acid": 26
+    }
   },
   {
     "id": 67,
@@ -1258,10 +2283,21 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.933,
     "tier": "PHC",
     "bedsTotal": 40,
-    "bedsAvailable": 5,
+    "bedsAvailable": 4,
     "specialties": [
-      "general"
-    ]
+      "emergency",
+      "general",
+      "orthopedics",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "atropine": 14,
+      "packed_rbcs": 10,
+      "tranexamic_acid": 3,
+      "rabies_serum": 7,
+      "adrenaline": 8,
+      "oxytocin": 9
+    }
   },
   {
     "id": 68,
@@ -1274,11 +2310,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.91,
     "tier": "DH",
     "bedsTotal": 80,
-    "bedsAvailable": 10,
+    "bedsAvailable": 8,
     "specialties": [
+      "emergency",
       "cardiology",
-      "emergency"
-    ]
+      "orthopedics",
+      "obstetrics",
+      "pediatrics"
+    ],
+    "medicineStock": {
+      "antivenom": 36,
+      "streptokinase": 21,
+      "atropine": 32,
+      "packed_rbcs": 18,
+      "salbutamol": 27,
+      "tranexamic_acid": 12,
+      "rabies_serum": 32,
+      "adrenaline": 15,
+      "dextrose_25": 45,
+      "magnesium_sulfate": 30,
+      "oxytocin": 35,
+      "mannitol": 24
+    }
   },
   {
     "id": 69,
@@ -1291,11 +2344,27 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.898,
     "tier": "CHC",
     "bedsTotal": 60,
-    "bedsAvailable": 7,
+    "bedsAvailable": 9,
     "specialties": [
       "emergency",
-      "general"
-    ]
+      "orthopedics",
+      "obstetrics",
+      "pediatrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 19,
+      "streptokinase": 19,
+      "atropine": 20,
+      "mannitol": 16,
+      "packed_rbcs": 11,
+      "salbutamol": 6,
+      "tranexamic_acid": 26,
+      "rabies_serum": 18,
+      "adrenaline": 21,
+      "dextrose_25": 19,
+      "oxytocin": 23
+    }
   },
   {
     "id": 70,
@@ -1308,13 +2377,30 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.889,
     "tier": "DH",
     "bedsTotal": 175,
-    "bedsAvailable": 21,
+    "bedsAvailable": 33,
     "specialties": [
       "emergency",
       "cardiology",
+      "general",
+      "orthopedics",
+      "obstetrics",
       "neurology",
-      "orthopedics"
-    ]
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 31,
+      "streptokinase": 46,
+      "atropine": 39,
+      "mannitol": 41,
+      "packed_rbcs": 24,
+      "tranexamic_acid": 25,
+      "rabies_serum": 45,
+      "adrenaline": 18,
+      "dextrose_25": 23,
+      "magnesium_sulfate": 22,
+      "oxytocin": 44,
+      "salbutamol": 40
+    }
   },
   {
     "id": 71,
@@ -1327,13 +2413,29 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.836,
     "tier": "DH",
     "bedsTotal": 150,
-    "bedsAvailable": 18,
+    "bedsAvailable": 34,
     "specialties": [
       "emergency",
+      "cardiology",
       "general",
-      "ophthalmology",
-      "pediatrics"
-    ]
+      "obstetrics",
+      "neurology",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 28,
+      "streptokinase": 23,
+      "atropine": 42,
+      "mannitol": 18,
+      "packed_rbcs": 28,
+      "salbutamol": 37,
+      "tranexamic_acid": 27,
+      "rabies_serum": 25,
+      "adrenaline": 45,
+      "dextrose_25": 12,
+      "magnesium_sulfate": 36,
+      "oxytocin": 31
+    }
   },
   {
     "id": 72,
@@ -1346,12 +2448,30 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.846,
     "tier": "DH",
     "bedsTotal": 90,
-    "bedsAvailable": 11,
+    "bedsAvailable": 8,
     "specialties": [
       "emergency",
       "cardiology",
-      "orthopedics"
-    ]
+      "general",
+      "orthopedics",
+      "obstetrics",
+      "pediatrics",
+      "neurology"
+    ],
+    "medicineStock": {
+      "antivenom": 26,
+      "streptokinase": 36,
+      "atropine": 46,
+      "mannitol": 30,
+      "packed_rbcs": 32,
+      "salbutamol": 13,
+      "tranexamic_acid": 18,
+      "rabies_serum": 21,
+      "adrenaline": 32,
+      "dextrose_25": 19,
+      "magnesium_sulfate": 21,
+      "oxytocin": 32
+    }
   },
   {
     "id": 73,
@@ -1364,11 +2484,23 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.849,
     "tier": "PHC",
     "bedsTotal": 35,
-    "bedsAvailable": 4,
+    "bedsAvailable": 8,
     "specialties": [
-      "obstetrics",
-      "general"
-    ]
+      "emergency",
+      "general",
+      "pediatrics"
+    ],
+    "medicineStock": {
+      "antivenom": 7,
+      "atropine": 9,
+      "mannitol": 6,
+      "salbutamol": 12,
+      "tranexamic_acid": 7,
+      "rabies_serum": 15,
+      "dextrose_25": 7,
+      "magnesium_sulfate": 8,
+      "oxytocin": 9
+    }
   },
   {
     "id": 74,
@@ -1383,9 +2515,21 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "bedsTotal": 30,
     "bedsAvailable": 4,
     "specialties": [
-      "obstetrics",
-      "general"
-    ]
+      "emergency",
+      "orthopedics",
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "streptokinase": 8,
+      "atropine": 8,
+      "mannitol": 12,
+      "packed_rbcs": 15,
+      "tranexamic_acid": 12,
+      "rabies_serum": 11,
+      "adrenaline": 3,
+      "dextrose_25": 13,
+      "magnesium_sulfate": 10
+    }
   },
   {
     "id": 75,
@@ -1398,11 +2542,26 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.913,
     "tier": "CHC",
     "bedsTotal": 50,
-    "bedsAvailable": 6,
+    "bedsAvailable": 10,
     "specialties": [
+      "emergency",
+      "orthopedics",
       "pediatrics",
-      "emergency"
-    ]
+      "ophthalmology"
+    ],
+    "medicineStock": {
+      "antivenom": 26,
+      "streptokinase": 14,
+      "atropine": 10,
+      "mannitol": 27,
+      "tranexamic_acid": 23,
+      "rabies_serum": 12,
+      "dextrose_25": 14,
+      "magnesium_sulfate": 23,
+      "oxytocin": 7,
+      "salbutamol": 39,
+      "adrenaline": 33
+    }
   },
   {
     "id": 76,
@@ -1415,12 +2574,28 @@ export const MUMBAI_MMR_HOSPITALS: MumbaiHospitalData[] = [
     "lng": 72.861,
     "tier": "DH",
     "bedsTotal": 110,
-    "bedsAvailable": 13,
+    "bedsAvailable": 22,
     "specialties": [
       "emergency",
       "cardiology",
-      "orthopedics"
-    ]
+      "general",
+      "orthopedics",
+      "obstetrics",
+      "pediatrics"
+    ],
+    "medicineStock": {
+      "antivenom": 16,
+      "streptokinase": 14,
+      "atropine": 24,
+      "mannitol": 44,
+      "salbutamol": 33,
+      "tranexamic_acid": 29,
+      "rabies_serum": 47,
+      "adrenaline": 27,
+      "dextrose_25": 29,
+      "oxytocin": 36,
+      "packed_rbcs": 15
+    }
   }
 ];
 
