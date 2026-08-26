@@ -163,14 +163,59 @@ export function MapView({
   const animFrameRef = useRef<number>(0);
   const lastHandledDispatchKeyRef = useRef<string | null>(null);
 
-  // Smooth camera pan when hospital is clicked from Patient Portal
+  // Dynamic Patient Coordinates
+  const patientLat = userLat || DEFAULT_PATIENT_LAT;
+  const patientLng = userLng || DEFAULT_PATIENT_LNG;
+
+  const previewPolylineRef = useRef<L.Polyline | null>(null);
+
+
+  // Smooth camera pan and preview path when hospital is clicked from Patient Portal
   useEffect(() => {
-    if (selectedHospitalId === undefined || selectedHospitalId === null || !mapRef.current) return;
-    const hosp = MUMBAI_MMR_HOSPITALS.find((h) => h.id === selectedHospitalId);
-    if (hosp) {
-      mapRef.current.flyTo([hosp.lat, hosp.lng], 15, { animate: true, duration: 1.0 });
+    if (!mapRef.current) return;
+
+    if (selectedHospitalId === undefined || selectedHospitalId === null) {
+      if (previewPolylineRef.current) {
+        previewPolylineRef.current.remove();
+        previewPolylineRef.current = null;
+      }
+      return;
     }
-  }, [selectedHospitalId]);
+
+    const hosp = MUMBAI_MMR_HOSPITALS.find((h) => h.id === selectedHospitalId);
+    if (!hosp) return;
+
+    if (previewPolylineRef.current) {
+      previewPolylineRef.current.remove();
+    }
+
+    const pLat = patientLat;
+    const pLng = patientLng;
+    const hLat = hosp.lat || MUMBAI_HOSPITAL_COORDINATES[hosp.id]?.lat || 19.2125;
+    const hLng = hosp.lng || MUMBAI_HOSPITAL_COORDINATES[hosp.id]?.lng || 73.0933;
+
+    const previewPath: [number, number][] = [
+      [pLat, pLng],
+      [pLat + (hLat - pLat) * 0.25 + 0.0012, pLng + (hLng - pLng) * 0.25 - 0.0008],
+      [pLat + (hLat - pLat) * 0.50, pLng + (hLng - pLng) * 0.50 + 0.0015],
+      [pLat + (hLat - pLat) * 0.75 - 0.0008, pLng + (hLng - pLng) * 0.75 + 0.0010],
+      [hLat, hLng],
+    ];
+
+    const poly = L.polyline(previewPath, {
+      color: '#2563eb',
+      weight: 4,
+      opacity: 0.85,
+      dashArray: '8, 8',
+      lineCap: 'round',
+    }).addTo(mapRef.current);
+
+    previewPolylineRef.current = poly;
+
+    const bounds = L.latLngBounds([[pLat, pLng], [hLat, hLng]]);
+    mapRef.current.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+  }, [selectedHospitalId, patientLat, patientLng]);
+
 
 
   // Predefined Case Animation references
@@ -183,14 +228,9 @@ export function MapView({
   const [liveEta, setLiveEta] = useState<number>(0);
   const [liveDist, setLiveDist] = useState<number>(0);
   const [liveSpeed, setLiveSpeed] = useState<number>(65);
-
-
-  // Dynamic Patient Coordinates
-  const patientLat = userLat || DEFAULT_PATIENT_LAT;
-  const patientLng = userLng || DEFAULT_PATIENT_LNG;
-
-  // Predefined Cases State
   const [cases, setCases] = useState<RegionalEmergencyCase[]>(INITIAL_EMERGENCY_CASES);
+
+
   const [selectedCaseId, setSelectedCaseId] = useState<string>('case-01');
   const [filterPriority, setFilterPriority] = useState<'ALL' | 'CRITICAL' | 'URGENT' | 'STABLE'>('ALL');
   const [isCasesDrawerOpen, setIsCasesDrawerOpen] = useState<boolean>(false);
@@ -568,6 +608,11 @@ export function MapView({
     const map = mapRef.current;
     const routeGroup = routeLayerGroupRef.current;
 
+    if (previewPolylineRef.current) {
+      previewPolylineRef.current.remove();
+      previewPolylineRef.current = null;
+    }
+
     routeGroup.clearLayers();
     if (movingAmbulanceMarkerRef.current) {
       movingAmbulanceMarkerRef.current.remove();
@@ -576,6 +621,7 @@ export function MapView({
     if (animFrameRef.current) {
       cancelAnimationFrame(animFrameRef.current);
     }
+
 
     const depotCoord: [number, number] = [patientLat + 0.0038, patientLng + 0.0040];
     const patientCoord: [number, number] = [patientLat, patientLng];
@@ -614,7 +660,7 @@ export function MapView({
     const leg1DistInfo = getPathDistances(leg1Path);
     const leg2DistInfo = getPathDistances(leg2Path);
 
-    const leg1Glow = L.polyline(leg1Path, {
+    L.polyline(leg1Path, {
       color: '#38bdf8',
       weight: 8,
       opacity: 0.45,
@@ -622,7 +668,7 @@ export function MapView({
       lineJoin: 'round',
     }).addTo(routeGroup);
 
-    const leg1Core = L.polyline(leg1Path, {
+    L.polyline(leg1Path, {
       color: '#0284c7',
       weight: 4,
       opacity: 0.95,
@@ -631,7 +677,7 @@ export function MapView({
       dashArray: '6, 6',
     }).addTo(routeGroup);
 
-    const leg2Glow = L.polyline(leg2Path, {
+    L.polyline(leg2Path, {
       color: '#f87171',
       weight: 8,
       opacity: 0.45,
@@ -639,13 +685,14 @@ export function MapView({
       lineJoin: 'round',
     }).addTo(routeGroup);
 
-    const leg2Core = L.polyline(leg2Path, {
+    L.polyline(leg2Path, {
       color: '#dc2626',
       weight: 4,
       opacity: 0.95,
       lineCap: 'round',
       lineJoin: 'round',
     }).addTo(routeGroup);
+
 
     const allCoords = [...leg1Path, ...leg2Path];
     const bounds = L.latLngBounds(allCoords.map((c) => L.latLng(c[0], c[1])));
@@ -776,12 +823,9 @@ export function MapView({
 
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-      leg1Glow.remove();
-      leg1Core.remove();
-      leg2Glow.remove();
-      leg2Core.remove();
     };
-  }, [activeDispatch, hospitals, patientLat, patientLng]);
+  }, [activeDispatch?.id, activeDispatch?.timestamp, activeDispatch?.assignedHospitalId]);
+
 
   const centerOnPatient = useCallback(() => {
     if (!mapRef.current) return;
