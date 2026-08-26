@@ -1,0 +1,240 @@
+[
+  {
+    "hospital_id": "MC001",
+    "hospital_name": "G. T. Hospital",
+    "location": "Fort, Mumbai",
+    "administrative_area": "Mumbai City",
+    "ownership_or_system": "State Government"
+  },
+  {
+    "hospital_id": "MC002",
+    "hospital_name": "J J Hospital",
+    "location": "Nagpada–Mumbai Central, Mumbai",
+    "administrative_area": "Mumbai City",
+    "ownership_or_system": "State Government"
+  },
+  {
+    "hospital_id": "MC003",
+    "hospital_name": "K E M Hospital",
+    "location": "Parel, Mumbai",
+    "administrative_area": "Mumbai City",
+    "ownership_or_system": "Municipal"
+  },
+  {
+    "hospital_id": "MC004",
+    "hospital_name": "Municipal Hospital",
+    "location": "MS Ali Road, Chor Bazaar, Kamathipura, Mumbai",
+    "administrative_area": "Mumbai City",
+    "ownership_or_system": "Municipal"
+  },
+  {
+    "hospital_id": "MC005",
+    "hospital_name": "Saifee Hospital",
+    "location": "Opera House, Girgaon, Mumbai",
+    "administrative_area": "Mumbai City",
+    "ownership_or_system": "Private"
+  },
+  {
+    "hospital_id": "MC006",
+    "hospital_name": "St George Hospital",
+    "location": "Fort, Mumbai",
+    "administrative_area": "Mumbai City",
+    "ownership_or_system": "State Government"
+  },
+  {
+    "hospital_id": "MS001",
+    "hospital_name": "Bhabha Hospital",
+    "location": "Bandra West, Mumbai",
+    "administrative_area": "Mumbai Suburban",
+    "ownership_or_system": "BMC"
+  },
+  {
+    "hospital_id": "MS002",
+    "hospital_name": "Centenary Municipal General Hospital",
+    "location": "Kandivali West, Mumbai",
+    "administrative_area": "Mumbai Suburban",
+    "ownership_or_system": "BMC"
+  },
+  {
+    "hospital_id": "MS003",
+    "hospital_name": "Dr. R. N. Cooper Medical College and General Hospital",
+    "location": "Juhu, Mumbai",
+    "administrative_area": "Mumbai Suburban",
+    "ownership_or_system": "BMC"
+  },
+  {
+    "hospital_id": "MS004",
+    "hospital_name": "Lilavati Hospital and Research Centre",
+    "location": "Bandra Reclamation, Bandra West, Mumbai",
+    "administrative_area": "Mumbai Suburban",
+    "ownership_or_system": "Private"
+  },
+  {
+    "hospital_id": "MS005",
+    "hospital_name": "Rajawadi Hospital",
+    "location": "Ghatkopar East, Mumbai",
+    "administrative_area": "Mumbai Suburban",
+    "ownership_or_system": "BMC"
+  },
+  {
+    "hospital_id": "MS006",
+    "hospital_name": "S V D Savarkar Municipal General Hospital",
+    "location": "Mulund East, Mumbai",
+    "administrative_area": "Mumbai Suburban",
+    "ownership_or_system": "BMC"
+  },
+  {
+    "hospital_id": "MS007",
+    "hospital_name": "V. N. Desai Municipal General Hospital",
+    "location": "Santacruz East, Mumbai",
+    "administrative_area": "Mumbai Suburban",
+    "ownership_or_system": "BMC"
+  },
+  {
+    "hospital_id": "TH001",
+    "hospital_name": "Central Hospital Ulhasnagar",
+    "location": "Press Bazar, Ulhasnagar",
+    "administrative_area": "Thane District",
+    "ownership_or_system": "Government"
+  },
+  {
+    "hospital_id": "TH002",
+    "hospital_name": "Chhatrapati Shivaji Maharaj Hospital, Kalwa",
+    "location": "Thane–Belapur Road, Kalwa, Thane",
+    "administrative_area": "Thane District",
+    "ownership_or_system": "Municipal / TMC"
+  },
+  {
+    "hospital_id": "TH003",
+    "hospital_name": "Civil Hospital Thane",
+    "location": "Tembhi Naka, Thane West",
+    "administrative_area": "Thane District",
+    "ownership_or_system": "Government"
+  },
+  {
+    "hospital_id": "TH004",
+    "hospital_name": "Government Hospital Mira Bhayandar",
+    "location": "Mira Bhayandar, Thane District",
+    "administrative_area": "Thane District",
+    "ownership_or_system": "Government"
+  },
+  {
+    "hospital_id": "TH005",
+    "hospital_name": "Indira Gandhi Hospital Bhiwandi",
+    "location": "Near Bhiwandi Court, Agra Road, Bhiwandi",
+    "administrative_area": "Thane District",
+    "ownership_or_system": "Government / Municipal"
+  },
+  {
+    "hospital_id": "TH006",
+    "hospital_name": "KDMC Hospital, Dombivli",
+    "location": "Kopar Gaon Road, Shastri Nagar, Dombivli West",
+    "administrative_area": "Thane District",
+    "ownership_or_system": "KDMC"
+  },
+  {
+    "hospital_id": "TH007",
+    "hospital_name": "NMMC Hospital Vashi Navi Mumbai",
+    "location": "Sector 10A, Vashi, Navi Mumbai",
+    "administrative_area": "Navi Mumbai / Thane District",
+    "ownership_or_system": "NMMC"
+  },
+  {
+    "hospital_id": "TH008",
+    "hospital_name": "Rukmini Hospital Kalyan",
+    "location": "Mahatma Phule Chowk, Murbad Road, Kalyan",
+    "administrative_area": "Thane District",
+    "ownership_or_system": "Private"
+  },
+  {
+    "hospital_id": "NM001",
+    "hospital_name": "MGM Hospital",
+    "location": "Belapur, Navi Mumbai",
+    "administrative_area": "Navi Mumbai",
+    "ownership_or_system": "Private"
+  },
+  {
+    "hospital_id": "NM002",
+    "hospital_name": "MGM Hospital",
+    "location": "Vashi, Navi Mumbai",
+    "administrative_area": "Navi Mumbai",
+    "ownership_or_system": "Private"
+  },
+  {
+    "hospital_id": "NM003",
+    "hospital_name": "Sterling Hospital",
+    "location": "Vashi, Navi Mumbai",
+    "administrative_area": "Navi Mumbai",
+    "ownership_or_system": "Private"
+  },
+  {
+    "hospital_id": "NM004",
+    "hospital_name": "Jijamata Hospital",
+    "location": "Vashi, Navi Mumbai",
+    "administrative_area": "Navi Mumbai",
+    "ownership_or_system": "Private"
+  },
+  {
+    "hospital_id": "NM005",
+    "hospital_name": "Dr. Mahajan Hospital",
+    "location": "Rabale, TBIA, Navi Mumbai",
+    "administrative_area": "Navi Mumbai",
+    "ownership_or_system": "Private"
+  },
+  {
+    "hospital_id": "NM006",
+    "hospital_name": "Shri Sadguru Seva Mandal Hospital",
+    "location": "Thane–Belapur Road, Navi Mumbai",
+    "administrative_area": "Navi Mumbai",
+    "ownership_or_system": "Private"
+  },
+  {
+    "hospital_id": "NM007",
+    "hospital_name": "MGM Hospital",
+    "location": "Kamothe, Navi Mumbai",
+    "administrative_area": "Navi Mumbai",
+    "ownership_or_system": "Private"
+  },
+  {
+    "hospital_id": "NM008",
+    "hospital_name": "NMMC General Hospital - Vashi",
+    "location": "Vashi, Navi Mumbai",
+    "administrative_area": "Navi Mumbai",
+    "ownership_or_system": "NMMC"
+  },
+  {
+    "hospital_id": "NM009",
+    "hospital_name": "NMMC General Hospital - Nerul",
+    "location": "Nerul, Navi Mumbai",
+    "administrative_area": "Navi Mumbai",
+    "ownership_or_system": "NMMC"
+  },
+  {
+    "hospital_id": "NM010",
+    "hospital_name": "NMMC General Hospital - Airoli",
+    "location": "Airoli, Navi Mumbai",
+    "administrative_area": "Navi Mumbai",
+    "ownership_or_system": "NMMC"
+  },
+  {
+    "hospital_id": "NM011",
+    "hospital_name": "ESIS Hospital",
+    "location": "Vashi, Navi Mumbai",
+    "administrative_area": "Navi Mumbai",
+    "ownership_or_system": "Government / ESIC"
+  },
+  {
+    "hospital_id": "NM012",
+    "hospital_name": "MCH - Turbhe",
+    "location": "Turbhe, Navi Mumbai",
+    "administrative_area": "Navi Mumbai",
+    "ownership_or_system": "NMMC MCH"
+  },
+  {
+    "hospital_id": "NM013",
+    "hospital_name": "MCH - Koparkhairane",
+    "location": "Koparkhairane, Navi Mumbai",
+    "administrative_area": "Navi Mumbai",
+    "ownership_or_system": "NMMC MCH"
+  }
+]

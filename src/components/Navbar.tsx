@@ -1,11 +1,12 @@
 /* ── Navbar — Top Navigation Bar with Role Switcher & Multi-Language Selector ── */
 
-import { Wifi, WifiOff, Activity, Ambulance, BedDouble, UserCircle2, LogOut } from 'lucide-react';
+import { Wifi, WifiOff, Activity, Ambulance, BedDouble, UserCircle2, LogOut, FlaskConical } from 'lucide-react';
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../i18n/LanguageContext';
 import { LanguageSelector } from './LanguageSelector';
 import { OfflineToggle } from './OfflineToggle';
+import { soundEffects } from '../services/soundEffects';
 import './Navbar.css';
 
 interface NavbarProps {
@@ -13,9 +14,18 @@ interface NavbarProps {
   ambulanceActive: number;
   totalBeds: number;
   pendingSyncs: number;
+  isSimulationMode?: boolean;
+  onToggleSimulation?: () => void;
 }
 
-export function Navbar({ ambulanceIdle, ambulanceActive, totalBeds, pendingSyncs }: NavbarProps) {
+export function Navbar({
+  ambulanceIdle,
+  ambulanceActive,
+  totalBeds,
+  pendingSyncs,
+  isSimulationMode = false,
+  onToggleSimulation,
+}: NavbarProps) {
   const { effectivelyOnline } = useOfflineStatus();
   const { profile, logout } = useAuth();
   const { t } = useLanguage();
@@ -59,8 +69,24 @@ export function Navbar({ ambulanceIdle, ambulanceActive, totalBeds, pendingSyncs
         </div>
       </div>
 
-      {/* Profile & Role Switcher + Language Selector + Offline Toggle */}
+      {/* Profile & Role Switcher + Simulation Lab + Language Selector + Offline Toggle */}
       <div className="navbar__actions">
+        {/* Simulation Lab Toggle Button */}
+        {onToggleSimulation && (
+          <button
+            className={`navbar__sim-btn ${isSimulationMode ? 'navbar__sim-btn--active' : ''}`}
+            onClick={() => {
+              soundEffects.playClick();
+              onToggleSimulation();
+            }}
+            title="Open Algorithmic Verification & Disaster Simulation Lab"
+            id="navbar-sim-btn"
+          >
+            <FlaskConical size={16} className={isSimulationMode ? 'animate-pulse' : ''} />
+            <span>Simulation Lab</span>
+          </button>
+        )}
+
         {pendingSyncs > 0 && (
           <div className="navbar__sync-badge clay-badge clay-badge--warning">
             {pendingSyncs} {t('queued')}

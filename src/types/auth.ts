@@ -9,6 +9,8 @@ export interface UserProfile {
   avatar: string;
   villageName?: string;
   villageNodeId?: number;
+  lat?: number;
+  lng?: number;
   hospitalId?: number;
   hospitalName?: string;
   ambulanceId?: number;

@@ -1,6 +1,6 @@
 /* ── usePathfinder Hook ──
    React hook wrapping the pathfinding Web Worker
-   Manages worker lifecycle, request/response, loading states
+   Manages worker lifecycle, request/response, loading states, 2-leg routing & fleet state
 */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -64,14 +64,15 @@ export function usePathfinder() {
     };
   }, []);
 
-  // Load graph data into worker
+  // Load graph and fleet data into worker
   const initializeGraph = useCallback(async () => {
     if (!workerRef.current) return;
 
-    const [nodes, edges, hospitals] = await Promise.all([
+    const [nodes, edges, hospitals, ambulances] = await Promise.all([
       db.nodes.toArray(),
       db.edges.toArray(),
       db.hospitals.toArray(),
+      db.ambulances.toArray(),
     ]);
 
     workerRef.current.postMessage({
@@ -87,17 +88,25 @@ export function usePathfinder() {
         specialties: h.specialties,
         medicineStock: h.medicineStock,
       })),
+      ambulances: ambulances.map((a) => ({
+        id: a.id,
+        currentNodeId: a.currentNodeId,
+        status: a.status,
+        vehicleType: a.vehicleType,
+      })),
     });
   }, []);
 
-  // Find optimal route
+  // Find optimal 2-leg route with dynamic ambulance matching
   const findRoute = useCallback(
-    (
+    async (
       sourceNodeId: number,
       urgencyTier: UrgencyTier,
       requiredSpecialty?: Specialty,
       requiredMedicine?: string,
     ): Promise<RouteResult> => {
+      const liveAmbulances = await db.ambulances.toArray();
+
       return new Promise((resolve, reject) => {
         if (!workerRef.current || !state.isInitialized) {
           reject('Pathfinder not initialized');
@@ -115,6 +124,12 @@ export function usePathfinder() {
           urgencyTier,
           requiredSpecialty,
           requiredMedicine,
+          ambulances: liveAmbulances.map((a) => ({
+            id: a.id,
+            currentNodeId: a.currentNodeId,
+            status: a.status,
+            vehicleType: a.vehicleType,
+          })),
         };
 
         workerRef.current.postMessage(message);
@@ -141,11 +156,25 @@ export function usePathfinder() {
     [],
   );
 
+  // Update ambulance state
+  const updateAmbulance = useCallback(
+    (ambulanceId: number, status: 'IDLE' | 'DISPATCHED' | 'EN_ROUTE' | 'RETURNING', currentNodeId?: number) => {
+      workerRef.current?.postMessage({
+        type: 'UPDATE_AMBULANCE',
+        ambulanceId,
+        status,
+        currentNodeId,
+      });
+    },
+    [],
+  );
+
   return {
     ...state,
     initializeGraph,
     findRoute,
     updateEdge,
     updateHospital,
+    updateAmbulance,
   };
 }

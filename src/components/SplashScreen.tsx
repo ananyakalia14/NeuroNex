@@ -17,24 +17,22 @@ interface SplashScreenProps {
 }
 
 export function SplashScreen({
-  isLoading,
   onComplete,
 }: SplashScreenProps) {
   const [show, setShow] = useState(true);
 
   useEffect(() => {
-    if (!isLoading) {
-      const timer = setTimeout(() => {
-        setShow(false);
-        setTimeout(onComplete, 400);
-      }, 1800);
-      return () => clearTimeout(timer);
-    }
-  }, [isLoading, onComplete]);
+    // Smooth intro animation, then transition to login page
+    const timer = setTimeout(() => {
+      setShow(false);
+      onComplete();
+    }, 900);
+    return () => clearTimeout(timer);
+  }, [onComplete]);
 
   const handleSkip = () => {
     setShow(false);
-    setTimeout(onComplete, 150);
+    onComplete();
   };
 
   return (

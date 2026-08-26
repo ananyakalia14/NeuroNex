@@ -88,6 +88,15 @@ export const TRANSLATIONS = {
     tip2: 'Clear the entrance or driveway for the ambulance crew.',
     tip3: 'Keep patient identification and medical documents ready.',
     closeAndNew: 'Close & New Emergency Request',
+    findHospital: 'Find Hospital',
+    findSpecialist: 'Find Specialist',
+    findMedicine: 'Find Medicine',
+    searchHospital: 'Search hospital by name or ICU...',
+    searchSpecialist: 'Search medical specialist...',
+    searchMedicine: 'Search emergency medicine or blood...',
+    routeToHospital: 'Get Route / Dispatch',
+    routeToSpecialist: 'Route to Specialist',
+    routeToMedicine: 'Route to Pharmacy Facility',
 
     // Hospital Portal
     hospitalDashboard: 'Hospital Bed & Pharmacy Manager',
@@ -195,6 +204,15 @@ export const TRANSLATIONS = {
     tip2: 'घराचा रस्ता आणि प्रवेशद्वार रुग्णवाहिकेसाठी मोकळा ठेवा.',
     tip3: 'रुग्णाची आवश्यक कागदपत्रे व ओळखपत्र जवळ ठेवा.',
     closeAndNew: 'विनंती पूर्ण करा / नवीन मदत मागा',
+    findHospital: 'हॉस्पिटल शोधा',
+    findSpecialist: 'तज्ज्ञ डॉक्टर शोधा',
+    findMedicine: 'औषधे शोधा',
+    searchHospital: 'हॉस्पिटलचे नाव किंवा आयसीयू शोधा...',
+    searchSpecialist: 'तज्ज्ञ डॉक्टर शोधा...',
+    searchMedicine: 'तातडीचे औषध किंवा रक्त शोधा...',
+    routeToHospital: 'मार्ग काढा / रुग्णवाहिका बोलवा',
+    routeToSpecialist: 'डॉक्टरकडे नेव्हिगेट करा',
+    routeToMedicine: 'औषध उपलब्ध हॉस्पिटलकडे जा',
 
     // Hospital Portal
     hospitalDashboard: 'रुग्णालय बेड्स व औषध व्यवस्थापन',
@@ -302,6 +320,15 @@ export const TRANSLATIONS = {
     tip2: 'एम्बुलेंस के लिए रास्ता और घर का मुख्य द्वार खुला रखें।',
     tip3: 'मरीज के जरूरी दस्तावेज और पहचान पत्र तैयार रखें।',
     closeAndNew: 'अनुरोध समाप्त करें / नई मदद मांगें',
+    findHospital: 'अस्पताल खोजें',
+    findSpecialist: 'विशेषज्ञ डॉक्टर खोजें',
+    findMedicine: 'दवाएं खोजें',
+    searchHospital: 'अस्पताल का नाम या आईसीयू खोजें...',
+    searchSpecialist: 'विशेषज्ञ डॉक्टर खोजें...',
+    searchMedicine: 'आपातकालीन दवा या ब्लड खोजें...',
+    routeToHospital: 'मार्ग खोजें / एम्बुलेंस बुलाएं',
+    routeToSpecialist: 'डॉक्टर के पास जाएं',
+    routeToMedicine: 'दवा उपलब्ध अस्पताल के लिए मार्ग',
 
     // Hospital Portal
     hospitalDashboard: 'अस्पताल बेड और दवा प्रबंधन',

@@ -1,0 +1,437 @@
+/* ── SimulationLab Styles — JeevaRaah Clay & Glass Blend ── */
+
+.sim-lab {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: var(--sp-4, 1rem) var(--sp-5, 1.25rem);
+  background: var(--jr-bg, #F1F8E9);
+  color: var(--jr-text, #1B2E1B);
+  font-family: var(--font-family, 'Outfit', sans-serif);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4, 1rem);
+  border-radius: var(--radius-lg, 24px);
+}
+
+.sim-lab__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.sim-lab__title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sim-lab__title {
+  font-size: var(--font-lg, 1.25rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--jr-text, #1B2E1B);
+  margin: 0;
+}
+
+.sim-lab__badge {
+  padding: 3px 10px;
+  border-radius: var(--radius-pill, 999px);
+  background: var(--jr-danger-light, #FFEBEE);
+  border: 1px solid rgba(198, 40, 40, 0.2);
+  color: var(--jr-danger, #C62828);
+  font-size: var(--font-xs, 0.6875rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.sim-lab__subtitle {
+  font-size: var(--font-sm, 0.8125rem);
+  color: var(--jr-text-secondary, #4A6249);
+  margin: 4px 0 0 0;
+}
+
+.sim-lab__running-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Live Test Harness Card ── */
+.sim-lab__harness {
+  background: var(--jr-surface, #FFFFFF);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: var(--radius-md, 18px);
+  padding: var(--sp-4, 1rem) var(--sp-5, 1.25rem);
+  box-shadow: var(--clay-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sim-lab__harness-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.sim-lab__harness-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.sim-lab__harness-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm, 12px);
+  background: var(--jr-green-pale, #E8F5E9);
+  border: 1px solid var(--jr-green-light, #66BB6A);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--jr-green, #2E7D32);
+  flex-shrink: 0;
+}
+
+.sim-lab__harness-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sim-lab__harness-title {
+  font-size: var(--font-base, 0.9375rem);
+  font-weight: 800;
+  color: var(--jr-text, #1B2E1B);
+  margin: 0;
+}
+
+.sim-lab__pill-tag {
+  padding: 2px 8px;
+  border-radius: var(--radius-pill, 999px);
+  background: var(--jr-blue-pale, #E8EAF6);
+  color: var(--jr-blue, #3949AB);
+  font-size: 0.625rem;
+  font-weight: 800;
+}
+
+.sim-lab__harness-desc {
+  font-size: var(--font-sm, 0.8125rem);
+  color: var(--jr-text-secondary, #4A6249);
+  margin: 4px 0 0 0;
+}
+
+/* ── 4-Phase Grid ── */
+.sim-lab__steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.sim-lab__step-card {
+  padding: 12px 14px;
+  border-radius: var(--radius-sm, 12px);
+  background: var(--jr-bg, #F1F8E9);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all 0.25s ease;
+}
+
+.sim-lab__step-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.625rem;
+  font-weight: 800;
+  color: var(--jr-text-tertiary, #7A947A);
+  letter-spacing: 0.04em;
+}
+
+.sim-lab__step-name {
+  font-size: var(--font-sm, 0.8125rem);
+  font-weight: 800;
+  color: var(--jr-text, #1B2E1B);
+}
+
+.sim-lab__step-desc {
+  font-size: 0.6875rem;
+  color: var(--jr-text-secondary, #4A6249);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.sim-lab__step-card--active {
+  background: #EFF6FF;
+  border-color: #93C5FD;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
+}
+
+.sim-lab__step-card--reject {
+  background: #FEF2F2;
+  border-color: #FCA5A5;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.12);
+}
+
+.sim-lab__step-card--success {
+  background: var(--jr-green-pale, #E8F5E9);
+  border-color: var(--jr-green-light, #66BB6A);
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.12);
+}
+
+.sim-lab__step-card--reroute {
+  background: #FFFBEB;
+  border-color: #FCD34D;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.12);
+}
+
+/* Result Banner */
+.sim-lab__result-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm, 12px);
+  background: var(--jr-green-pale, #E8F5E9);
+  border: 1px solid var(--jr-green-light, #66BB6A);
+}
+
+.sim-lab__result-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--font-sm, 0.8125rem);
+  color: var(--jr-text, #1B2E1B);
+}
+
+.sim-lab__view-map-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  border-radius: var(--radius-pill, 999px);
+  color: #FFFFFF;
+  background: var(--jr-green, #2E7D32);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(46, 125, 50, 0.25);
+  transition: all 0.2s ease;
+}
+
+.sim-lab__view-map-btn:hover {
+  background: var(--jr-green-deep, #1B5E20);
+  transform: translateY(-1px);
+}
+
+/* ── Extreme Disaster Catalog Section ── */
+.sim-lab__catalog-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sim-lab__catalog-title {
+  font-size: var(--font-md, 1.0625rem);
+  font-weight: 800;
+  color: var(--jr-text, #1B2E1B);
+  margin: 0;
+}
+
+.sim-lab__catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.sim-lab__scenario-card {
+  padding: 14px;
+  border-radius: var(--radius-md, 18px);
+  background: var(--jr-surface, #FFFFFF);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: var(--clay-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+
+.sim-lab__scenario-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--clay-shadow-hover);
+}
+
+.sim-lab__scenario-card--active {
+  border-color: var(--jr-danger, #C62828);
+  background: #FFF5F5;
+  box-shadow: 0 6px 20px rgba(198, 40, 40, 0.15);
+}
+
+.sim-lab__scenario-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sim-lab__scenario-title-grp {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.sim-lab__scenario-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm, 12px);
+  background: var(--jr-danger-light, #FFEBEE);
+  color: var(--jr-danger, #C62828);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sim-lab__scenario-name {
+  font-size: var(--font-sm, 0.8125rem);
+  font-weight: 800;
+  color: var(--jr-text, #1B2E1B);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.sim-lab__scenario-cat {
+  font-size: 0.625rem;
+  color: var(--jr-text-tertiary, #7A947A);
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.sim-lab__risk-badge {
+  padding: 2px 8px;
+  border-radius: var(--radius-pill, 999px);
+  background: var(--jr-danger-light, #FFEBEE);
+  color: var(--jr-danger, #C62828);
+  font-size: 0.625rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.sim-lab__scenario-desc {
+  font-size: var(--font-xs, 0.6875rem);
+  color: var(--jr-text-secondary, #4A6249);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.sim-lab__scenario-specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm, 12px);
+  background: var(--jr-bg, #F1F8E9);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.sim-lab__spec-lbl {
+  font-size: 0.5625rem;
+  font-weight: 800;
+  color: var(--jr-text-tertiary, #7A947A);
+  letter-spacing: 0.04em;
+}
+
+.sim-lab__spec-val {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  color: var(--jr-text, #1B2E1B);
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+.sim-lab__launch-btn {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  border-radius: var(--radius-pill, 999px);
+  color: #FFFFFF;
+  background: linear-gradient(135deg, var(--jr-green, #2E7D32), var(--jr-green-deep, #1B5E20));
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+  transition: all 0.2s ease;
+}
+
+.sim-lab__launch-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(46, 125, 50, 0.35);
+}
+
+.sim-lab__launch-btn--active {
+  background: linear-gradient(135deg, #DC2626, #B91C1C) !important;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3) !important;
+}
+
+.sim-lab__launch-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Generic Button Helpers ── */
+.sim-lab__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  border-radius: var(--radius-pill, 999px);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sim-lab__btn--primary {
+  background: linear-gradient(135deg, var(--jr-green, #2E7D32), var(--jr-green-deep, #1B5E20));
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+}
+
+.sim-lab__btn--secondary {
+  background: var(--jr-surface, #FFFFFF);
+  color: var(--jr-text, #1B2E1B);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: var(--clay-shadow);
+}
+
+.sim-lab__btn--step {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  border: 1px solid #BFDBFE;
+}
+
+.sim-lab__btn--stop {
+  background: #FEF2F2;
+  color: #DC2626;
+  border: 1px solid #FECACA;
+}

@@ -253,8 +253,8 @@ export function DriverPortal({
               <span className="driver-portal__info-label">
                 <MapPin size={13} /> {t('patientLocation')}
               </span>
-              <span className="driver-portal__info-text">
-                Dombivli East, Manpada Road (Near Gharda Circle)
+              <span className="driver-portal__info-text font-semibold text-dark">
+                {profile.villageName || 'Real-Time GPS Location (India)'}
               </span>
             </div>
 

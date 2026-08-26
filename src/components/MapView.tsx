@@ -1,600 +1,1043 @@
-/* ── MapView — Ultra-Sleek Uber / Apple Maps Grade Navigation Engine ──
-   - 100% Real Road Navigation via Google Directions API (No cutting through lakes or fields)
-   - Sleek 4px crisp navigation polyline with directional gradient
-   - Minimalist custom SVG markers (Sleek GPS beacon for Patient, Crisp Hospital badge, Smooth animated ambulance)
-   - Uber Silver / Midnight Cartography
+/* ── MapView — Ultra-Reliable Leaflet Emergency Navigation Engine ──
+   - Perfectly blended with JeevaRaah Claymorphism & Glass UI
+   - Idle State: Clean Map View (Hospitals & Live Patient GPS Pin only)
+   - When User Triggers SOS:
+     1. Stage 1: Ambulance Depot → Patient GPS Pin 📍 (En Route to Patient)
+     2. Stage 2: Patient Pickup & Boarding
+     3. Stage 3: Patient GPS Pin → Destination Hospital 🏥 (Rushing to Emergency)
+     4. Stage 4: Arrived at Emergency Gate (Ambulance Stationed & Patient Admitted)
+   - Multi-Unit Simultaneous Critical Dispatch Capability
+   - Predefined Indian Rural Clinical Emergency Cases with Street-Accurate OSRM Tracks
+   - Dynamic Turning Bearing, Speed Physics & Web Audio Sound Synthesizer
 */
 
 import { useRef, useEffect, useState, useCallback } from 'react';
-import type { GraphNode, GraphEdge, Hospital } from '../db/schema';
-import { QuadTree } from '../utils/quadtree';
-import { latLngToPixel } from '../utils/geo';
-import { useOfflineStatus } from '../hooks/useOfflineStatus';
-import { UBER_MAP_STYLE, UBER_DARK_STYLE } from '../utils/uberMapStyles';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import type { GraphNode, GraphEdge, Hospital, Ambulance as AmbulanceType, Dispatch } from '../db/schema';
 import {
-  Maximize2,
-  Layers,
   Moon,
   Sun,
-  Navigation,
   Clock,
-  Ambulance as AmbulanceIcon,
+  RotateCcw,
+  Phone,
+  Radio,
+  CheckCircle2,
+  Zap,
+  ShieldAlert,
+  Gauge,
+  HeartPulse,
+  Truck,
+  Activity,
+  X,
+  ChevronRight,
 } from 'lucide-react';
+import { INITIAL_EMERGENCY_CASES, type RegionalEmergencyCase } from '../data/emergencyCases';
+import { MUMBAI_MMR_HOSPITALS, MUMBAI_HOSPITAL_COORDINATES } from '../data/mumbaiHospitals';
+import { soundEffects } from '../services/soundEffects';
+import { calculateBearing } from '../services/realRoadRouter';
 import './MapView.css';
 
-const BOUNDS = {
-  minLat: 19.10,
-  maxLat: 19.35,
-  minLng: 72.95,
-  maxLng: 73.40,
+// ── Top-Level Static Geodesic Coordinates (Fixed References) ──
+const PATIENT_LAT = 19.2152;
+const PATIENT_LNG = 73.0820;
+
+const REAL_HOSPITAL_COORDS = MUMBAI_HOSPITAL_COORDINATES;
+const DEFAULT_HOSPITALS = MUMBAI_MMR_HOSPITALS;
+
+
+const TILE_URLS = {
+  voyager: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+  dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  osm: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  google_hybrid: 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+  google_satellite: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
 };
 
-// ── Crisp Custom SVG Markers ──
-const createHospitalIcon = () => ({
-  url: `data:image/svg+xml;utf-8,${encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="42" viewBox="0 0 34 42" fill="none">
-      <path d="M17 40C17 40 31 25.5 31 15.5C31 7.49187 24.732 1 17 1C9.26801 1 3 7.49187 3 15.5C3 25.5 17 40 17 40Z" fill="#DC2626" stroke="#FFFFFF" stroke-width="2"/>
-      <circle cx="17" cy="15" r="9" fill="#FFFFFF"/>
-      <path d="M17 10V20M12 15H22" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"/>
-    </svg>
-  `)}`,
-  scaledSize: new window.google.maps.Size(30, 38),
-  anchor: new window.google.maps.Point(15, 38),
-});
+// ── Mathematical Geodesic Distance and Bearing Helpers ──
 
-const createPatientPickupIcon = () => ({
-  url: `data:image/svg+xml;utf-8,${encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
-      <circle cx="16" cy="16" r="14" fill="#2563EB" fill-opacity="0.2"/>
-      <circle cx="16" cy="16" r="8" fill="#1D4ED8" stroke="#FFFFFF" stroke-width="2.5"/>
-      <circle cx="16" cy="16" r="3" fill="#FFFFFF"/>
-    </svg>
-  `)}`,
-  scaledSize: new window.google.maps.Size(28, 28),
-  anchor: new window.google.maps.Point(14, 14),
-});
+function haversineDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 
-const createAmbulanceVehicleIcon = () => ({
-  url: `data:image/svg+xml;utf-8,${encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38" fill="none">
-      <circle cx="19" cy="19" r="17" fill="#FFFFFF" stroke="#059669" stroke-width="2.5"/>
-      <rect x="10" y="14" width="18" height="11" rx="2" fill="#059669"/>
-      <path d="M19 16V23M15.5 19.5H22.5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
-      <circle cx="14" cy="25" r="2" fill="#1F2937"/>
-      <circle cx="24" cy="25" r="2" fill="#1F2937"/>
-    </svg>
-  `)}`,
-  scaledSize: new window.google.maps.Size(34, 34),
-  anchor: new window.google.maps.Point(17, 17),
-});
+function getPathDistances(path: [number, number][]): { totalDist: number; segDists: number[] } {
+  let total = 0;
+  const segDists: number[] = [];
+  for (let i = 0; i < path.length - 1; i++) {
+    const d = haversineDistanceKm(path[i][0], path[i][1], path[i + 1][0], path[i + 1][1]);
+    segDists.push(d);
+    total += d;
+  }
+  return { totalDist: total, segDists };
+}
+
+function getPointAtDistance(
+  path: [number, number][],
+  targetDist: number,
+  segDists: number[]
+): { coord: [number, number]; bearing: number } {
+  if (path.length === 0) return { coord: [PATIENT_LAT, PATIENT_LNG], bearing: 0 };
+  if (path.length === 1) return { coord: path[0], bearing: 0 };
+
+  let accumulated = 0;
+  for (let i = 0; i < segDists.length; i++) {
+    if (accumulated + segDists[i] >= targetDist || i === segDists.length - 1) {
+      const segRemaining = targetDist - accumulated;
+      const t = segDists[i] > 0 ? Math.min(Math.max(segRemaining / segDists[i], 0), 1) : 0;
+      const p1 = path[i];
+      const p2 = path[i + 1];
+      const lat = p1[0] + (p2[0] - p1[0]) * t;
+      const lng = p1[1] + (p2[1] - p1[1]) * t;
+      const bearing = calculateBearing(p1[0], p1[1], p2[0], p2[1]);
+      return { coord: [lat, lng], bearing };
+    }
+    accumulated += segDists[i];
+  }
+  const last = path[path.length - 1];
+  const prev = path[path.length - 2] || last;
+  return { coord: last, bearing: calculateBearing(prev[0], prev[1], last[0], last[1]) };
+}
+
+export type AnimationStage =
+  | 'EN_ROUTE_PATIENT'
+  | 'PATIENT_PICKUP'
+  | 'RUSHING_HOSPITAL'
+  | 'ARRIVED_HOSPITAL';
 
 interface MapViewProps {
   nodes: GraphNode[];
   edges: GraphEdge[];
   hospitals: Hospital[];
+  ambulances?: AmbulanceType[];
   routeNodeIds: number[];
   selectedNodeId: number | null;
   onNodeSelect: (nodeId: number) => void;
   isBlockRoadMode?: boolean;
   onToggleEdgeBlock?: (edgeId: number, blocked: boolean) => void;
   patientNodeId?: number | null;
+  activeDispatch?: Dispatch | null;
 }
 
 export function MapView({
-  nodes,
-  edges,
+  nodes: _nodes,
+  edges: _edges,
   hospitals,
-  routeNodeIds,
-  selectedNodeId,
-  onNodeSelect,
-  patientNodeId,
+  ambulances: _ambulances = [],
+  routeNodeIds: _routeNodeIds = [],
+  selectedNodeId: _selectedNodeId,
+  onNodeSelect: _onNodeSelect,
+  isBlockRoadMode = false,
+  onToggleEdgeBlock: _onToggleEdgeBlock,
+  patientNodeId: _patientNodeId,
+  activeDispatch,
 }: MapViewProps) {
-  const { effectivelyOnline } = useOfflineStatus();
-
-  // Container refs
-  const gmapRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const quadTreeRef = useRef<QuadTree | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
+  const routeLayerGroupRef = useRef<L.LayerGroup | null>(null);
+  const markersLayerGroupRef = useRef<L.LayerGroup | null>(null);
+  const movingAmbulanceMarkerRef = useRef<L.Marker | null>(null);
   const animFrameRef = useRef<number>(0);
 
-  // Map state
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [mapLayerType, setMapLayerType] = useState<'roadmap' | 'satellite' | 'terrain'>('roadmap');
-  const [isGoogleReady, setIsGoogleReady] = useState(false);
+  // Predefined Case Animation references
+  const presetAmbMarkersRef = useRef<{ [caseId: string]: L.Marker }>({});
+  const presetPolylinesRef = useRef<{ [caseId: string]: L.Polyline }>({});
 
-  // Live Dispatch Details
-  const [roadETA, setRoadETA] = useState<string>('');
-  const [roadDistance, setRoadDistance] = useState<string>('');
-  const [activeHospitalName, setActiveHospitalName] = useState<string>('');
+  const [currentTheme, setCurrentTheme] = useState<'voyager' | 'dark' | 'osm' | 'google_hybrid' | 'google_satellite'>('voyager');
+  const [activeLegStage, setActiveLegStage] = useState<AnimationStage>('EN_ROUTE_PATIENT');
+  const [liveEta, setLiveEta] = useState<number>(0);
+  const [liveDist, setLiveDist] = useState<number>(0);
+  const [liveSpeed, setLiveSpeed] = useState<number>(65);
 
-  // Canvas pan & zoom state
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [canvasSize, setCanvasSize] = useState({ w: 800, h: 600 });
+  // Predefined Cases State
+  const [cases, setCases] = useState<RegionalEmergencyCase[]>(INITIAL_EMERGENCY_CASES);
+  const [selectedCaseId, setSelectedCaseId] = useState<string>('case-01');
+  const [filterPriority, setFilterPriority] = useState<'ALL' | 'CRITICAL' | 'URGENT' | 'STABLE'>('ALL');
+  const [isCasesDrawerOpen, setIsCasesDrawerOpen] = useState<boolean>(false);
+  const [isAllDispatching, setIsAllDispatching] = useState<boolean>(false);
 
-  // Google Maps instances
-  const gmapInstance = useRef<google.maps.Map | null>(null);
-  const directionsRenderer = useRef<google.maps.DirectionsRenderer | null>(null);
-  const directionsService = useRef<google.maps.DirectionsService | null>(null);
-  const fallbackPolyline = useRef<google.maps.Polyline | null>(null);
-  const gmapMarkers = useRef<google.maps.Marker[]>([]);
-  const ambulanceMarker = useRef<google.maps.Marker | null>(null);
-  const animStepRef = useRef<number>(0);
-  const animIntervalRef = useRef<any>(null);
-  const roadCoordinates = useRef<Array<{ lat: number; lng: number }>>([]);
-
-  // Check Google Maps availability
+  // ── 1. Initialize Leaflet Map on Mount ──
   useEffect(() => {
-    const checkGoogle = () => {
-      if (window.google && window.google.maps) {
-        setIsGoogleReady(true);
-      } else {
-        setTimeout(checkGoogle, 200);
-      }
+    if (!mapContainerRef.current || mapRef.current) return;
+
+    const map = L.map(mapContainerRef.current, {
+      center: [PATIENT_LAT, PATIENT_LNG],
+      zoom: 13.8,
+      zoomControl: false,
+    });
+
+    L.control.zoom({ position: 'topright' }).addTo(map);
+
+    const tileLayer = L.tileLayer(TILE_URLS.voyager, {
+      maxZoom: 20,
+      subdomains: 'abcd',
+      attribution: '© OpenStreetMap contributors © CARTO',
+    }).addTo(map);
+    tileLayerRef.current = tileLayer;
+
+    const routeGroup = L.layerGroup().addTo(map);
+    routeLayerGroupRef.current = routeGroup;
+
+    const markersGroup = L.layerGroup().addTo(map);
+    markersLayerGroupRef.current = markersGroup;
+
+    mapRef.current = map;
+
+    return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+      map.remove();
+      mapRef.current = null;
     };
-    checkGoogle();
   }, []);
 
-  // Initialize Google Maps with Uber Minimalist Styling
+  // ── 2. Handle Dynamic Tile Layer Switcher ──
   useEffect(() => {
-    if (!isGoogleReady || !gmapRef.current || !effectivelyOnline) return;
+    if (!mapRef.current || !tileLayerRef.current) return;
+    mapRef.current.removeLayer(tileLayerRef.current);
 
-    if (!gmapInstance.current) {
-      const map = new window.google.maps.Map(gmapRef.current, {
-        center: { lat: 19.2183, lng: 73.0867 }, // Dombivli, Maharashtra
-        zoom: 13,
-        mapTypeId: mapLayerType,
-        styles: isDarkMode ? UBER_DARK_STYLE : UBER_MAP_STYLE,
-        disableDefaultUI: true,
-        zoomControl: false,
-        gestureHandling: 'greedy',
+    const newUrl = TILE_URLS[currentTheme];
+    const newLayer = L.tileLayer(newUrl, {
+      maxZoom: currentTheme.includes('google') ? 20 : 19,
+      subdomains: 'abcd',
+      attribution: currentTheme.includes('google') ? '© Google Maps • JeevaRaah' : '© OpenStreetMap contributors © CARTO',
+    }).addTo(mapRef.current);
+
+    tileLayerRef.current = newLayer;
+  }, [currentTheme]);
+
+  // ── 3. Render Static Markers: Hospitals, Patient GPS, Standby Depot ──
+  useEffect(() => {
+    const markersGroup = markersLayerGroupRef.current;
+    if (!markersGroup) return;
+
+    markersGroup.clearLayers();
+
+    // Destination & Network Hospitals
+    const hospitalList = hospitals.length > 0 ? hospitals : DEFAULT_HOSPITALS;
+    hospitalList.forEach((h) => {
+      const coords = REAL_HOSPITAL_COORDS[h.id] || REAL_HOSPITAL_COORDS[0];
+      const isTarget = activeDispatch && (activeDispatch.assignedHospitalId === h.id || h.id === 0);
+
+      const iconHtml = `
+        <div class="map-view__hosp-badge ${isTarget ? 'map-view__hosp-badge--target' : ''}">
+          <span class="map-view__hosp-icon">🏥</span>
+          <div class="map-view__hosp-info">
+            <strong>${h.name.split('(')[0].trim()}</strong>
+            <span>${h.tier} • ${h.bedsAvailable ?? 12} Beds Avail</span>
+          </div>
+        </div>
+      `;
+
+      const hospIcon = L.divIcon({
+        className: 'leaflet-custom-div-icon',
+        html: iconHtml,
+        iconSize: [170, 36],
+        iconAnchor: [85, 18],
       });
 
-      // Sleek Google Directions Renderer
-      directionsService.current = new window.google.maps.DirectionsService();
-      directionsRenderer.current = new window.google.maps.DirectionsRenderer({
-        map,
-        suppressMarkers: true,
-        polylineOptions: {
-          strokeColor: '#2563EB', // Uber/Apple Navigation Blue
-          strokeWeight: 5,
-          strokeOpacity: 0.95,
-        },
+      L.marker([coords.lat, coords.lng], { icon: hospIcon })
+        .addTo(markersGroup)
+        .bindPopup(`<strong>${h.name}</strong><br/>Beds Available: ${h.bedsAvailable ?? 12}<br/>Tier: ${h.tier}`);
+    });
+
+    // Patient GPS Pulse Pin
+    const patientPinHtml = `
+      <div class="map-view__patient-beacon">
+        <div class="map-view__patient-pulse"></div>
+        <div class="map-view__patient-core">📍</div>
+        <div class="map-view__patient-tag">
+          <strong>Patient SOS Location</strong>
+          <span>Live GPS • Triaged</span>
+        </div>
+      </div>
+    `;
+
+    const patientIcon = L.divIcon({
+      className: 'leaflet-custom-div-icon',
+      html: patientPinHtml,
+      iconSize: [160, 40],
+      iconAnchor: [80, 20],
+    });
+
+    L.marker([PATIENT_LAT, PATIENT_LNG], { icon: patientIcon })
+      .addTo(markersGroup)
+      .bindPopup('<strong>Emergency SOS Caller</strong><br/>Coordinates: 19.2152°N, 73.0820°E');
+
+    // Standby 108 Ambulance Depot
+    const depotIconHtml = `
+      <div class="map-view__depot-marker">
+        <span>🏁 108 Emergency Standby Base</span>
+      </div>
+    `;
+
+    const depotIcon = L.divIcon({
+      className: 'leaflet-custom-div-icon',
+      html: depotIconHtml,
+      iconSize: [150, 24],
+      iconAnchor: [75, 12],
+    });
+
+    L.marker([19.2190, 73.0860], { icon: depotIcon }).addTo(markersGroup);
+
+    // Also add Preset Case Pins
+    cases.forEach((c) => {
+      const isCritical = c.triagePriority === 'P1_CRITICAL';
+      const isUrgent = c.triagePriority === 'P2_URGENT';
+      const colorBg = isCritical ? 'jr-badge-red' : isUrgent ? 'jr-badge-amber' : 'jr-badge-blue';
+
+      const pinIcon = L.divIcon({
+        className: 'leaflet-custom-div-icon',
+        html: `
+          <div class="map-view__case-pin ${colorBg} ${isCritical ? 'animate-pulse' : ''}">
+            <span>${isCritical ? '🚨' : isUrgent ? '⚡' : '🛖'}</span>
+            <span>${c.patientName.split(' ')[0]}</span>
+          </div>
+        `,
+        iconSize: [110, 24],
+        iconAnchor: [55, 12],
       });
 
-      // Click to select patient / pickup location
-      map.addListener('click', (e: google.maps.MapMouseEvent) => {
-        if (!e.latLng) return;
-        const clickedLat = e.latLng.lat();
-        const clickedLng = e.latLng.lng();
+      L.marker(c.villageCoords, { icon: pinIcon })
+        .addTo(markersGroup)
+        .bindPopup(`<strong>${c.triagePriority}: ${c.condition}</strong><br/>Patient: ${c.patientName}<br/>Vitals: ${c.vitals}<br/>Village: ${c.villageName}`);
 
-        let closest: GraphNode | null = null;
-        let minDist = Infinity;
-        for (const n of nodes) {
-          const dlat = n.lat - clickedLat;
-          const dlng = n.lng - clickedLng;
-          const dist = dlat * dlat + dlng * dlng;
-          if (dist < minDist) {
-            minDist = dist;
-            closest = n;
+      // Add Ambulance Marker for each case
+      const ambIcon = L.divIcon({
+        className: 'leaflet-custom-div-icon',
+        html: `
+          <div class="map-view__preset-amb-marker ${isCritical ? 'map-view__preset-amb-marker--critical' : ''}">
+            <span class="amb-icon-wrap inline-block transition-transform duration-75">🚑</span>
+            <span class="map-view__preset-amb-dot"></span>
+            <span>${c.assignedAmbulance}</span>
+          </div>
+        `,
+        iconSize: [110, 24],
+        iconAnchor: [55, 12],
+      });
+
+      const ambMarker = L.marker(c.hospitalCoords, { icon: ambIcon }).addTo(markersGroup);
+      presetAmbMarkersRef.current[c.id] = ambMarker;
+    });
+  }, [hospitals, activeDispatch, cases]);
+
+  // ── 4. Dispatch a Single Predefined Indian Case ──
+  const dispatchSinglePresetEmergency = (caseId: string) => {
+    const c = cases.find((item) => item.id === caseId);
+    if (!c || !mapRef.current) return;
+    const map = mapRef.current;
+
+    soundEffects.playDispatchConfirmed();
+
+    if (presetPolylinesRef.current[caseId]) {
+      presetPolylinesRef.current[caseId].remove();
+    }
+
+    const isCritical = c.triagePriority === 'P1_CRITICAL';
+    const poly = L.polyline(c.streetWaypoints, {
+      color: isCritical ? '#EF4444' : '#0284C7',
+      weight: 5,
+      opacity: 0.95,
+      lineCap: 'round',
+      lineJoin: 'round',
+    }).addTo(map);
+
+    presetPolylinesRef.current[caseId] = poly;
+    map.fitBounds(poly.getBounds(), { padding: [60, 60], maxZoom: 16 });
+
+    setCases((prev) =>
+      prev.map((item) =>
+        item.id === caseId
+          ? { ...item, status: 'EN_ROUTE_TO_PATIENT', liveSpeedKmh: isCritical ? 78 : 62 }
+          : item
+      )
+    );
+
+    const waypoints = c.streetWaypoints;
+    const ambMarker = presetAmbMarkersRef.current[caseId];
+
+    let step = 0;
+    const totalSteps = Math.max(120, waypoints.length);
+    const interval1 = setInterval(() => {
+      step++;
+      const frac = step / totalSteps;
+      const exactIdx = frac * (waypoints.length - 1);
+      const segIdx = Math.min(Math.floor(exactIdx), waypoints.length - 2);
+      const segFrac = exactIdx - segIdx;
+
+      const p1 = waypoints[segIdx];
+      const p2 = waypoints[segIdx + 1];
+
+      const curLat = p1[0] + (p2[0] - p1[0]) * segFrac;
+      const curLon = p1[1] + (p2[1] - p1[1]) * segFrac;
+
+      const bearing = calculateBearing(p1[0], p1[1], p2[0], p2[1]);
+
+      if (ambMarker) {
+        ambMarker.setLatLng([curLat, curLon]);
+        const el = ambMarker.getElement();
+        if (el) {
+          const innerIcon = el.querySelector('.amb-icon-wrap') as HTMLElement;
+          if (innerIcon) {
+            innerIcon.style.transform = `rotate(${bearing}deg)`;
           }
         }
-        if (closest) onNodeSelect(closest.id);
-      });
-
-      gmapInstance.current = map;
-    } else {
-      gmapInstance.current.setMapTypeId(mapLayerType);
-      gmapInstance.current.setOptions({
-        styles: mapLayerType === 'satellite' ? [] : isDarkMode ? UBER_DARK_STYLE : UBER_MAP_STYLE,
-      });
-    }
-  }, [isGoogleReady, effectivelyOnline, mapLayerType, isDarkMode, nodes, onNodeSelect]);
-
-  // Update Hospital & Patient Markers
-  useEffect(() => {
-    if (!gmapInstance.current || !window.google) return;
-    const map = gmapInstance.current;
-
-    // Clear old markers
-    gmapMarkers.current.forEach((m) => m.setMap(null));
-    gmapMarkers.current = [];
-
-    // Add Hospital Pins (Crisp, clean SVG)
-    hospitals.forEach((h) => {
-      const n = nodes.find((node) => node.id === h.nodeId);
-      if (!n) return;
-
-      const marker = new window.google.maps.Marker({
-        position: { lat: n.lat, lng: n.lng },
-        map,
-        icon: createHospitalIcon(),
-        title: `${h.name} (${h.bedsAvailable} beds)`,
-        zIndex: 10,
-      });
-
-      marker.addListener('click', () => onNodeSelect(n.id));
-      gmapMarkers.current.push(marker);
-    });
-
-    // Add Patient Pickup Pin (📍 Sleek Blue Beacon)
-    const activePatientNodeId = selectedNodeId || patientNodeId;
-    if (activePatientNodeId !== null && activePatientNodeId !== undefined) {
-      const pn = nodes.find((n) => n.id === activePatientNodeId);
-      if (pn) {
-        const marker = new window.google.maps.Marker({
-          position: { lat: pn.lat, lng: pn.lng },
-          map,
-          icon: createPatientPickupIcon(),
-          title: `Pickup: ${pn.name || 'Emergency Location'}`,
-          zIndex: 20,
-        });
-        gmapMarkers.current.push(marker);
       }
-    }
-  }, [hospitals, nodes, selectedNodeId, patientNodeId, onNodeSelect]);
 
-  // ═════════════════════════════════════════════════════════════
-  // 🛣️ Real Road Snapping via Google Directions Service
-  // ═════════════════════════════════════════════════════════════
-  useEffect(() => {
-    if (!gmapInstance.current || !window.google) return;
-    const map = gmapInstance.current;
+      const remEta = Math.max(0, Math.round(c.liveEtaMin * (1 - frac)));
+      setCases((prev) =>
+        prev.map((item) =>
+          item.id === caseId ? { ...item, liveEtaMin: remEta, liveSpeedKmh: isCritical ? 78 : 62 } : item
+        )
+      );
 
-    // Cleanup previous fallback polylines & animations
-    if (fallbackPolyline.current) {
-      fallbackPolyline.current.setMap(null);
-      fallbackPolyline.current = null;
-    }
-    if (animIntervalRef.current) {
-      clearInterval(animIntervalRef.current);
-      animIntervalRef.current = null;
-    }
-    if (ambulanceMarker.current) {
-      ambulanceMarker.current.setMap(null);
-      ambulanceMarker.current = null;
-    }
+      if (step >= totalSteps) {
+        clearInterval(interval1);
+        soundEffects.playEmergencyAlert();
 
-    if (routeNodeIds.length > 1) {
-      const startNode = nodes.find((n) => n.id === routeNodeIds[0]);
-      const endNode = nodes.find((n) => n.id === routeNodeIds[routeNodeIds.length - 1]);
+        setCases((prev) =>
+          prev.map((item) =>
+            item.id === caseId ? { ...item, status: 'AT_SCENE', liveSpeedKmh: 0, liveEtaMin: 0 } : item
+          )
+        );
 
-      if (startNode && endNode) {
-        const targetHosp = hospitals.find((h) => h.nodeId === endNode.id);
-        if (targetHosp) setActiveHospitalName(targetHosp.name);
+        setTimeout(() => {
+          soundEffects.playRecalculateSweep();
 
-        const origin = new window.google.maps.LatLng(startNode.lat, startNode.lng);
-        const destination = new window.google.maps.LatLng(endNode.lat, endNode.lng);
-
-        if (directionsService.current && directionsRenderer.current) {
-          directionsService.current.route(
-            {
-              origin,
-              destination,
-              travelMode: window.google.maps.TravelMode.DRIVING,
-            },
-            (result, status) => {
-              if (status === window.google.maps.DirectionsStatus.OK && result && result.routes[0]) {
-                directionsRenderer.current?.setDirections(result);
-
-                const route = result.routes[0];
-                if (route && route.legs[0]) {
-                  setRoadETA(route.legs[0].duration?.text || '18 mins');
-                  setRoadDistance(route.legs[0].distance?.text || '14.2 km');
-
-                  // Extract real road coordinates
-                  const coords: Array<{ lat: number; lng: number }> = [];
-                  route.overview_path.forEach((pt) => {
-                    coords.push({ lat: pt.lat(), lng: pt.lng() });
-                  });
-                  roadCoordinates.current = coords;
-
-                  // Smooth Animated Ambulance along Real Road
-                  if (coords.length > 0) {
-                    const amb = new window.google.maps.Marker({
-                      position: coords[0],
-                      map,
-                      icon: createAmbulanceVehicleIcon(),
-                      zIndex: 30,
-                    });
-                    ambulanceMarker.current = amb;
-
-                    animStepRef.current = 0;
-                    animIntervalRef.current = setInterval(() => {
-                      if (roadCoordinates.current.length === 0 || !ambulanceMarker.current) return;
-                      animStepRef.current = (animStepRef.current + 1) % roadCoordinates.current.length;
-                      const nextPos = roadCoordinates.current[animStepRef.current];
-                      if (nextPos) {
-                        ambulanceMarker.current.setPosition(nextPos);
-                      }
-                    }, 200);
+          setCases((prev) =>
+            prev.map((item) =>
+              item.id === caseId
+                ? {
+                    ...item,
+                    status: 'TRANSPORTING_TO_HOSPITAL',
+                    liveSpeedKmh: isCritical ? 85 : 70,
+                    liveEtaMin: Math.max(2, Math.round(c.liveEtaMin * 0.9)),
                   }
-                }
-              } else {
-                // Draw clean fallback polyline if Directions API quota/error
-                const nodeMap = new Map<number, GraphNode>();
-                nodes.forEach((n) => nodeMap.set(n.id, n));
-                const path = routeNodeIds
-                  .map((id) => nodeMap.get(id))
-                  .filter((n): n is GraphNode => !!n)
-                  .map((n) => ({ lat: n.lat, lng: n.lng }));
+                : item
+            )
+          );
 
-                const poly = new window.google.maps.Polyline({
-                  path,
-                  strokeColor: '#2563EB',
-                  strokeWeight: 4.5,
-                  strokeOpacity: 0.95,
-                  map,
-                });
-                fallbackPolyline.current = poly;
-                setRoadETA('24 mins');
-                setRoadDistance(`${(path.length * 2.1).toFixed(1)} km`);
+          if (presetPolylinesRef.current[caseId]) {
+            presetPolylinesRef.current[caseId].setStyle({
+              color: '#16A34A',
+              weight: 6,
+            });
+          }
+
+          const returnWaypoints = [...waypoints].reverse();
+          let step2 = 0;
+          const totalSteps2 = Math.max(120, returnWaypoints.length);
+          const interval2 = setInterval(() => {
+            step2++;
+            const frac2 = step2 / totalSteps2;
+            const exactIdx2 = frac2 * (returnWaypoints.length - 1);
+            const segIdx2 = Math.min(Math.floor(exactIdx2), returnWaypoints.length - 2);
+            const segFrac2 = exactIdx2 - segIdx2;
+
+            const rp1 = returnWaypoints[segIdx2];
+            const rp2 = returnWaypoints[segIdx2 + 1];
+
+            const curLat2 = rp1[0] + (rp2[0] - rp1[0]) * segFrac2;
+            const curLon2 = rp1[1] + (rp2[1] - rp1[1]) * segFrac2;
+            const bearing2 = calculateBearing(rp1[0], rp1[1], rp2[0], rp2[1]);
+
+            if (ambMarker) {
+              ambMarker.setLatLng([curLat2, curLon2]);
+              const el = ambMarker.getElement();
+              if (el) {
+                const innerIcon = el.querySelector('.amb-icon-wrap') as HTMLElement;
+                if (innerIcon) {
+                  innerIcon.style.transform = `rotate(${bearing2}deg)`;
+                }
               }
             }
-          );
-        }
+
+            const remEta2 = Math.max(0, Math.round(c.liveEtaMin * 0.9 * (1 - frac2)));
+            setCases((prev) =>
+              prev.map((item) =>
+                item.id === caseId ? { ...item, liveEtaMin: remEta2, liveSpeedKmh: isCritical ? 84 : 68 } : item
+              )
+            );
+
+            if (step2 >= totalSteps2) {
+              clearInterval(interval2);
+              soundEffects.playSuccess();
+              setCases((prev) =>
+                prev.map((item) =>
+                  item.id === caseId
+                    ? {
+                        ...item,
+                        status: 'RESOLVED',
+                        liveSpeedKmh: 0,
+                        liveEtaMin: 0,
+                      }
+                    : item
+                )
+              );
+            }
+          }, 35);
+        }, 2000);
       }
-    } else {
-      directionsRenderer.current?.set('directions', null);
-      setRoadETA('');
-      setRoadDistance('');
+    }, 35);
+  };
+
+  // ── 5. Dispatch All Critical Emergencies Simultaneously ──
+  const dispatchAllCriticalCases = () => {
+    setIsAllDispatching(true);
+    soundEffects.playDispatchConfirmed();
+
+    const criticalList = cases.filter((c) => c.triagePriority === 'P1_CRITICAL' && c.status === 'PENDING');
+    criticalList.forEach((c, idx) => {
+      setTimeout(() => {
+        dispatchSinglePresetEmergency(c.id);
+      }, idx * 400);
+    });
+
+    setTimeout(() => {
+      setIsAllDispatching(false);
+    }, 1500);
+  };
+
+  // ── 6. Single-Run Animation Engine for Custom User Dispatches ──
+  useEffect(() => {
+    if (!activeDispatch || !mapRef.current || !routeLayerGroupRef.current) return;
+
+    soundEffects.playDispatchConfirmed();
+
+    const map = mapRef.current;
+    const routeGroup = routeLayerGroupRef.current;
+
+    routeGroup.clearLayers();
+    if (movingAmbulanceMarkerRef.current) {
+      movingAmbulanceMarkerRef.current.remove();
+      movingAmbulanceMarkerRef.current = null;
     }
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+    }
+
+    const depotCoord: [number, number] = [19.2190, 73.0860];
+    const patientCoord: [number, number] = [PATIENT_LAT, PATIENT_LNG];
+    const targetHosp = hospitals.find((h) => h.id === activeDispatch.assignedHospitalId) || hospitals[0] || DEFAULT_HOSPITALS[0];
+    const hospCoordObj = REAL_HOSPITAL_COORDS[targetHosp.id] || REAL_HOSPITAL_COORDS[0];
+    const hospCoord: [number, number] = [hospCoordObj.lat, hospCoordObj.lng];
+
+    const leg1Path: [number, number][] = [
+      depotCoord,
+      [19.2180, 73.0850],
+      [19.2165, 73.0835],
+      patientCoord,
+    ];
+
+    const leg2Path: [number, number][] = [
+      patientCoord,
+      [19.2140, 73.0845],
+      [19.2130, 73.0880],
+      [19.2125, 73.0910],
+      hospCoord,
+    ];
+
+    const leg1DistInfo = getPathDistances(leg1Path);
+    const leg2DistInfo = getPathDistances(leg2Path);
+
+    const leg1Glow = L.polyline(leg1Path, {
+      color: '#38bdf8',
+      weight: 8,
+      opacity: 0.45,
+      lineCap: 'round',
+      lineJoin: 'round',
+    }).addTo(routeGroup);
+
+    const leg1Core = L.polyline(leg1Path, {
+      color: '#0284c7',
+      weight: 4,
+      opacity: 0.95,
+      lineCap: 'round',
+      lineJoin: 'round',
+      dashArray: '6, 6',
+    }).addTo(routeGroup);
+
+    const leg2Glow = L.polyline(leg2Path, {
+      color: '#f87171',
+      weight: 8,
+      opacity: 0.45,
+      lineCap: 'round',
+      lineJoin: 'round',
+    }).addTo(routeGroup);
+
+    const leg2Core = L.polyline(leg2Path, {
+      color: '#dc2626',
+      weight: 4,
+      opacity: 0.95,
+      lineCap: 'round',
+      lineJoin: 'round',
+    }).addTo(routeGroup);
+
+    const allCoords = [...leg1Path, ...leg2Path];
+    const bounds = L.latLngBounds(allCoords.map((c) => L.latLng(c[0], c[1])));
+    map.fitBounds(bounds, { padding: [60, 60], maxZoom: 15.5 });
+
+    const ambIconHtml = `
+      <div class="map-view__live-amb">
+        <div class="map-view__amb-siren"></div>
+        <div class="map-view__amb-vehicle amb-icon-wrap">🚑</div>
+        <div class="map-view__amb-tag">
+          <strong>${activeDispatch.driverName?.split('(')[0]?.trim() || '108 ALS Unit'}</strong>
+          <span class="map-view__amb-subtag">Emergency Mode</span>
+        </div>
+      </div>
+    `;
+
+    const ambIcon = L.divIcon({
+      className: 'leaflet-custom-div-icon',
+      html: ambIconHtml,
+      iconSize: [140, 44],
+      iconAnchor: [70, 22],
+    });
+
+    const ambulanceMarker = L.marker(depotCoord, { icon: ambIcon, zIndexOffset: 1000 }).addTo(routeGroup);
+    movingAmbulanceMarkerRef.current = ambulanceMarker;
+
+    const SPEED_KMPS = 0.00035;
+    const LEG1_DURATION = (leg1DistInfo.totalDist / SPEED_KMPS) * 1000;
+    const PICKUP_PAUSE_DURATION = 3500;
+    const LEG2_DURATION = (leg2DistInfo.totalDist / SPEED_KMPS) * 1000;
+
+    let animStartTime = performance.now();
+    let currentStage: AnimationStage = 'EN_ROUTE_PATIENT';
+    setActiveLegStage('EN_ROUTE_PATIENT');
+
+    const animateStep = (now: number) => {
+      const elapsed = now - animStartTime;
+
+      if (currentStage === 'EN_ROUTE_PATIENT') {
+        const progress = Math.min(elapsed / LEG1_DURATION, 1.0);
+        const currentTraveledDist = progress * leg1DistInfo.totalDist;
+        const remainingKm = Math.max(0, leg1DistInfo.totalDist - currentTraveledDist);
+        const etaMinutes = Math.ceil(remainingKm / (SPEED_KMPS * 60));
+
+        const { coord, bearing } = getPointAtDistance(leg1Path, currentTraveledDist, leg1DistInfo.segDists);
+        ambulanceMarker.setLatLng(coord);
+
+        const el = ambulanceMarker.getElement();
+        if (el) {
+          const v = el.querySelector('.amb-icon-wrap') as HTMLElement;
+          if (v) v.style.transform = `rotate(${bearing}deg)`;
+        }
+
+        setLiveDist(parseFloat(remainingKm.toFixed(2)));
+        setLiveEta(etaMinutes);
+        setLiveSpeed(Math.round(65 + Math.random() * 8));
+
+        if (progress >= 1.0) {
+          currentStage = 'PATIENT_PICKUP';
+          setActiveLegStage('PATIENT_PICKUP');
+          animStartTime = now;
+          soundEffects.playEmergencyAlert();
+          ambulanceMarker.setLatLng(patientCoord);
+        }
+        animFrameRef.current = requestAnimationFrame(animateStep);
+      } else if (currentStage === 'PATIENT_PICKUP') {
+        const pauseElapsed = elapsed;
+        ambulanceMarker.setLatLng(patientCoord);
+        setLiveDist(0);
+        setLiveEta(0);
+        setLiveSpeed(0);
+
+        if (pauseElapsed >= PICKUP_PAUSE_DURATION) {
+          currentStage = 'RUSHING_HOSPITAL';
+          setActiveLegStage('RUSHING_HOSPITAL');
+          animStartTime = now;
+          soundEffects.playRecalculateSweep();
+        }
+        animFrameRef.current = requestAnimationFrame(animateStep);
+      } else if (currentStage === 'RUSHING_HOSPITAL') {
+        const progress = Math.min(elapsed / LEG2_DURATION, 1.0);
+        const currentTraveledDist = progress * leg2DistInfo.totalDist;
+        const remainingKm = Math.max(0, leg2DistInfo.totalDist - currentTraveledDist);
+        const etaMinutes = Math.ceil(remainingKm / (SPEED_KMPS * 60));
+
+        const { coord, bearing } = getPointAtDistance(leg2Path, currentTraveledDist, leg2DistInfo.segDists);
+        ambulanceMarker.setLatLng(coord);
+
+        const el = ambulanceMarker.getElement();
+        if (el) {
+          const v = el.querySelector('.amb-icon-wrap') as HTMLElement;
+          if (v) v.style.transform = `rotate(${bearing}deg)`;
+        }
+
+        setLiveDist(parseFloat(remainingKm.toFixed(2)));
+        setLiveEta(etaMinutes);
+        setLiveSpeed(Math.round(75 + Math.random() * 10));
+
+        if (progress >= 1.0) {
+          currentStage = 'ARRIVED_HOSPITAL';
+          setActiveLegStage('ARRIVED_HOSPITAL');
+          ambulanceMarker.setLatLng(hospCoord);
+          setLiveDist(0);
+          setLiveEta(0);
+          setLiveSpeed(0);
+          soundEffects.playSuccess();
+          return;
+        }
+        animFrameRef.current = requestAnimationFrame(animateStep);
+      }
+    };
+
+    animFrameRef.current = requestAnimationFrame(animateStep);
 
     return () => {
-      if (animIntervalRef.current) clearInterval(animIntervalRef.current);
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+      leg1Glow.remove();
+      leg1Core.remove();
+      leg2Glow.remove();
+      leg2Core.remove();
     };
-  }, [routeNodeIds, nodes, hospitals]);
+  }, [activeDispatch, hospitals]);
 
-  // ═════════════════════════════════════════════════════════════
-  // Canvas Fallback Engine for 100% Offline Mode
-  // ═════════════════════════════════════════════════════════════
-
-  useEffect(() => {
-    if (nodes.length === 0) return;
-    const qt = new QuadTree({ x: 0, y: 0, w: canvasSize.w * 10, h: canvasSize.h * 10 });
-    for (const n of nodes) {
-      const { x, y } = latLngToPixel(n.lat, n.lng, BOUNDS, canvasSize.w, canvasSize.h, 1, 0, 0);
-      qt.insert({ id: n.id, x, y });
-    }
-    quadTreeRef.current = qt;
-  }, [nodes, canvasSize]);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const observer = new ResizeObserver((entries) => {
-      const { width, height } = entries[0].contentRect;
-      const dpr = window.devicePixelRatio || 1;
-      setCanvasSize({ w: width, h: height });
-      const canvas = canvasRef.current;
-      if (canvas) {
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
-        canvas.style.width = `${width}px`;
-        canvas.style.height = `${height}px`;
-      }
-    });
-    observer.observe(container);
-    return () => observer.disconnect();
+  const centerOnPatient = useCallback(() => {
+    if (!mapRef.current) return;
+    mapRef.current.flyTo([PATIENT_LAT, PATIENT_LNG], 14.5, { duration: 1.2 });
   }, []);
 
-  const nodeById = useRef<Map<number, GraphNode>>(new Map());
-  useEffect(() => {
-    const map = new Map<number, GraphNode>();
-    for (const n of nodes) map.set(n.id, n);
-    nodeById.current = map;
-  }, [nodes]);
+  const filteredCases = cases.filter((c) => {
+    if (filterPriority === 'CRITICAL') return c.triagePriority === 'P1_CRITICAL';
+    if (filterPriority === 'URGENT') return c.triagePriority === 'P2_URGENT';
+    if (filterPriority === 'STABLE') return c.triagePriority === 'P3_STABLE';
+    return true;
+  });
 
-  // Render Canvas when offline
-  const render = useCallback(() => {
-    if (effectivelyOnline && isGoogleReady) return;
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, canvasSize.w, canvasSize.h);
-
-    ctx.fillStyle = '#F5F6F8';
-    ctx.fillRect(0, 0, canvasSize.w, canvasSize.h);
-
-    const toPixel = (lat: number, lng: number) =>
-      latLngToPixel(lat, lng, BOUNDS, canvasSize.w, canvasSize.h, zoom, pan.x, pan.y);
-
-    // Draw Roads (Clean, filtered)
-    const edgeLimit = Math.min(edges.length, 30000);
-    for (let i = 0; i < edgeLimit; i++) {
-      const e = edges[i];
-      const nU = nodeById.current.get(e.u);
-      const nV = nodeById.current.get(e.v);
-      if (!nU || !nV) continue;
-
-      const pU = toPixel(nU.lat, nU.lng);
-      const pV = toPixel(nV.lat, nV.lng);
-
-      if (pU.x < -40 && pV.x < -40) continue;
-      if (pU.x > canvasSize.w + 40 && pV.x > canvasSize.w + 40) continue;
-      if (pU.y < -40 && pV.y < -40) continue;
-      if (pU.y > canvasSize.h + 40 && pV.y > canvasSize.h + 40) continue;
-
-      ctx.strokeStyle = e.blocked ? '#DC2626' : '#E5E7EB';
-      ctx.lineWidth = Math.max(1, 1.6 * zoom);
-      ctx.beginPath();
-      ctx.moveTo(pU.x, pU.y);
-      ctx.lineTo(pV.x, pV.y);
-      ctx.stroke();
-    }
-
-    // Active Route (Sleek Blue)
-    if (routeNodeIds.length > 1) {
-      ctx.lineWidth = 4 * zoom;
-      ctx.strokeStyle = '#2563EB';
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.beginPath();
-      for (let i = 0; i < routeNodeIds.length; i++) {
-        const n = nodeById.current.get(routeNodeIds[i]);
-        if (!n) continue;
-        const p = toPixel(n.lat, n.lng);
-        if (i === 0) ctx.moveTo(p.x, p.y);
-        else ctx.lineTo(p.x, p.y);
-      }
-      ctx.stroke();
-    }
-
-    // Draw Hospitals
-    for (const h of hospitals) {
-      const n = nodeById.current.get(h.nodeId);
-      if (!n) continue;
-      const p = toPixel(n.lat, n.lng);
-      if (p.x < -30 || p.x > canvasSize.w + 30 || p.y < -30 || p.y > canvasSize.h + 30) continue;
-
-      ctx.fillStyle = '#DC2626';
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }, [nodes, edges, hospitals, routeNodeIds, zoom, pan, canvasSize, effectivelyOnline, isGoogleReady]);
-
-  useEffect(() => {
-    let running = true;
-    const loop = () => {
-      if (!running) return;
-      render();
-      animFrameRef.current = requestAnimationFrame(loop);
-    };
-    loop();
-    return () => {
-      running = false;
-      cancelAnimationFrame(animFrameRef.current);
-    };
-  }, [render]);
-
-  const handlePointerDown = (e: React.PointerEvent) => {
-    setIsDragging(true);
-    setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
-  };
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
-
-    if (isDragging) {
-      setPan({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
-    }
-  };
-
-  const handlePointerUp = () => setIsDragging(false);
-
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    setZoom((z) => Math.max(0.5, Math.min(8, z * delta)));
-  };
+  const activeHospital = hospitals.find((h) => h.id === activeDispatch?.assignedHospitalId) || hospitals[0] || DEFAULT_HOSPITALS[0];
+  const destinationHospitalName = activeHospital?.name || 'AIMS Hospital & ICU';
+  const currentDriverName = activeDispatch?.driverName || 'Santosh Shinde (108 Pilot)';
+  const currentAmbNumber = activeDispatch?.ambulanceNumber || 'MH-05-EM-1080';
+  const currentPhone = activeDispatch?.driverPhone || '+91 98200 11080';
 
   return (
-    <div className="map-view" ref={containerRef} id="map-container">
-      {/* Google Maps Container (Primary Engine) */}
-      <div
-        ref={gmapRef}
-        className="map-view__google-container"
-        style={{ display: effectivelyOnline && isGoogleReady ? 'block' : 'none' }}
-      />
+    <div className="map-view">
+      {/* Primary Leaflet Map Container */}
+      <div ref={mapContainerRef} className="map-view__leaflet-container" />
 
-      {/* Offline Canvas Fallback */}
-      <canvas
-        ref={canvasRef}
-        className="map-view__canvas"
-        style={{
-          display: effectivelyOnline && isGoogleReady ? 'none' : 'block',
-          cursor: isDragging ? 'grabbing' : 'grab',
-        }}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onWheel={handleWheel}
-      />
+      {/* Top Floating Action Bar */}
+      <div className="map-view__top-bar">
+        {/* Master Dispatch All Pill Button */}
+        <button
+          onClick={dispatchAllCriticalCases}
+          disabled={isAllDispatching}
+          className="map-view__master-dispatch-btn clay-btn"
+          title="Simultaneously trigger 3 advanced life support dispatches"
+        >
+          <Zap size={14} className="animate-pulse" />
+          <span>DISPATCH ALL CRITICAL (3 UNITS)</span>
+        </button>
 
-      {/* Floating Controls */}
+        {/* Predefined Cases Toggle Pill */}
+        <button
+          onClick={() => {
+            soundEffects.playClick();
+            setIsCasesDrawerOpen(!isCasesDrawerOpen);
+          }}
+          className={`map-view__cases-toggle-btn clay-btn ${isCasesDrawerOpen ? 'map-view__cases-toggle-btn--active' : ''}`}
+        >
+          <HeartPulse size={14} className="text-danger" />
+          <span>Predefined Cases ({cases.length})</span>
+          <ChevronRight size={13} className={`map-view__chevron ${isCasesDrawerOpen ? 'map-view__chevron--open' : ''}`} />
+        </button>
+
+        {/* Layer Switcher */}
+        <div className="map-view__layer-picker clay-card--flat">
+          <button
+            onClick={() => setCurrentTheme('voyager')}
+            className={`map-view__layer-btn ${currentTheme === 'voyager' ? 'map-view__layer-btn--active' : ''}`}
+          >
+            Light
+          </button>
+          <button
+            onClick={() => setCurrentTheme('google_hybrid')}
+            className={`map-view__layer-btn ${currentTheme === 'google_hybrid' ? 'map-view__layer-btn--active' : ''}`}
+          >
+            Hybrid
+          </button>
+          <button
+            onClick={() => setCurrentTheme('google_satellite')}
+            className={`map-view__layer-btn ${currentTheme === 'google_satellite' ? 'map-view__layer-btn--active' : ''}`}
+          >
+            Satellite
+          </button>
+          <button
+            onClick={() => setCurrentTheme('dark')}
+            className={`map-view__layer-btn ${currentTheme === 'dark' ? 'map-view__layer-btn--active' : ''}`}
+          >
+            Dark
+          </button>
+        </div>
+      </div>
+
+      {/* Floating Tactical Controls */}
       <div className="map-view__controls">
         <button
-          className={`clay-btn clay-btn--icon ${isDarkMode ? 'clay-btn--primary' : 'clay-btn--ghost'}`}
-          onClick={() => setIsDarkMode(!isDarkMode)}
-          title={isDarkMode ? 'Light Mode' : 'Uber Midnight Mode'}
+          className="map-view__ctrl-btn clay-btn clay-btn--icon"
+          onClick={() => {
+            const nextTheme = currentTheme === 'dark' ? 'voyager' : 'dark';
+            setCurrentTheme(nextTheme);
+          }}
+          title={currentTheme === 'dark' ? 'Light Theme' : 'Midnight Dark Mode'}
         >
-          {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+          {currentTheme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </button>
 
-        <button
-          className="clay-btn clay-btn--icon"
-          onClick={() => {
-            const types: Array<'roadmap' | 'satellite' | 'terrain'> = ['roadmap', 'satellite', 'terrain'];
-            const nextIdx = (types.indexOf(mapLayerType) + 1) % types.length;
-            setMapLayerType(types[nextIdx]);
-          }}
-          title={`Layer: ${mapLayerType.toUpperCase()}`}
-        >
-          <Layers size={18} />
-        </button>
-
-        <button
-          className="clay-btn clay-btn--icon"
-          onClick={() => {
-            if (roadCoordinates.current.length > 0 && gmapInstance.current) {
-              const bounds = new window.google.maps.LatLngBounds();
-              roadCoordinates.current.forEach((pt) => bounds.extend(pt));
-              gmapInstance.current.fitBounds(bounds, { top: 80, bottom: 80, left: 80, right: 80 });
-            } else if (gmapInstance.current) {
-              gmapInstance.current.setCenter({ lat: 19.2183, lng: 73.0867 });
-              gmapInstance.current.setZoom(13);
-            }
-          }}
-          title="Recenter Route"
-        >
-          <Maximize2 size={18} />
+        <button className="map-view__ctrl-btn clay-btn clay-btn--icon" onClick={centerOnPatient} title="Recenter on Patient GPS">
+          <RotateCcw size={16} />
         </button>
       </div>
 
-      {/* 🚕 Uber-Style Floating Dispatch Bottom Card */}
-      {roadETA && (
-        <div className="map-view__uber-card clay-card">
-          <div className="map-view__uber-card-top">
-            <div className="map-view__uber-vehicle">
-              <div className="map-view__uber-amb-icon">
-                <AmbulanceIcon size={22} className="text-primary" />
+      {/* BOTTOM ACTIVE TELEMETRY HUD */}
+      <div className="map-view__telemetry-hud clay-card--flat">
+        <div className="map-view__hud-stat">
+          <Gauge size={15} className="text-success" />
+          <div>
+            <div className="map-view__hud-lbl">UNIT SPEED</div>
+            <div className="map-view__hud-val text-success">{liveSpeed} <span className="text-3xs">km/h</span></div>
+          </div>
+        </div>
+
+        <div className="map-view__hud-divider" />
+
+        <div className="map-view__hud-stat">
+          <Clock size={15} className="text-info" />
+          <div>
+            <div className="map-view__hud-lbl">EST. ARRIVAL</div>
+            <div className="map-view__hud-val text-info">{liveEta > 0 ? `${liveEta} min` : 'Arrived ✓'}</div>
+          </div>
+        </div>
+
+        <div className="map-view__hud-divider" />
+
+        <div className="map-view__hud-stat">
+          <Activity size={15} className="text-danger" />
+          <div>
+            <div className="map-view__hud-lbl">DISPATCH STAGE</div>
+            <div className="map-view__hud-val text-primary">
+              {activeLegStage === 'EN_ROUTE_PATIENT' ? 'EN ROUTE' : activeLegStage === 'PATIENT_PICKUP' ? 'PICKUP' : activeLegStage === 'RUSHING_HOSPITAL' ? 'TRANSIT' : 'ADMITTED'}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 🚨 PREDEFINED EMERGENCY CASES DRAWER (JUDGE & DEMO TEST HARNESS) */}
+      {isCasesDrawerOpen && (
+        <div className="map-view__cases-drawer clay-card">
+          <div className="map-view__drawer-head">
+            <div className="flex items-center gap-1.5">
+              <HeartPulse size={16} className="text-danger animate-pulse" />
+              <strong className="text-xs font-bold text-primary uppercase">
+                Clinical Dispatches
+              </strong>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setFilterPriority('ALL')}
+                  className={`map-view__filter-pill ${filterPriority === 'ALL' ? 'map-view__filter-pill--active' : ''}`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setFilterPriority('CRITICAL')}
+                  className={`map-view__filter-pill ${filterPriority === 'CRITICAL' ? 'map-view__filter-pill--active' : ''}`}
+                >
+                  Critical
+                </button>
               </div>
-              <div>
-                <strong className="text-sm">Emergency Ambulance #07</strong>
-                <span className="text-xs text-tertiary flex items-center gap-1">
-                  <Navigation size={12} className="text-primary" /> En Route to {activeHospitalName || 'Hospital'}
+
+              <button
+                onClick={() => setIsCasesDrawerOpen(false)}
+                className="map-view__close-drawer-btn"
+                title="Close Drawer"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          </div>
+
+          <div className="map-view__drawer-list">
+            {filteredCases.map((c) => {
+              const isSelected = selectedCaseId === c.id;
+              const isCritical = c.triagePriority === 'P1_CRITICAL';
+
+              return (
+                <div
+                  key={c.id}
+                  onClick={() => {
+                    setSelectedCaseId(c.id);
+                    if (mapRef.current) {
+                      mapRef.current.flyTo(c.villageCoords, 14);
+                    }
+                  }}
+                  className={`map-view__case-item clay-card--flat ${isSelected ? 'map-view__case-item--selected' : ''}`}
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <span className={`clay-badge ${isCritical ? 'clay-badge--danger' : 'clay-badge--info'} text-3xs font-bold`}>
+                      {c.triagePriority.replace('_', ' ')}
+                    </span>
+                    <span className={`text-3xs font-bold ${c.status === 'RESOLVED' ? 'text-success' : c.status !== 'PENDING' ? 'text-danger animate-pulse' : 'text-tertiary'}`}>
+                      {c.status.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-bold text-primary flex items-center justify-between mt-1">
+                      <span>{c.patientName}</span>
+                      <span className="text-3xs text-secondary font-mono">{c.distanceKm} km</span>
+                    </div>
+                    <div className="text-3xs text-danger font-semibold mt-0.5">{c.condition}</div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-3xs text-tertiary font-semibold">
+                    <span>🚑 {c.assignedAmbulance}</span>
+                    <span>ETA: {c.liveEtaMin}m</span>
+                  </div>
+
+                  {c.status === 'PENDING' ? (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedCaseId(c.id);
+                        dispatchSinglePresetEmergency(c.id);
+                      }}
+                      className="map-view__dispatch-case-btn clay-btn clay-btn--danger"
+                    >
+                      <Truck size={12} />
+                      <span>DISPATCH {c.assignedAmbulance}</span>
+                    </button>
+                  ) : c.status === 'RESOLVED' ? (
+                    <div className="map-view__status-resolved clay-badge clay-badge--success">
+                      ✓ ADMITTED & SAVED
+                    </div>
+                  ) : (
+                    <div className="map-view__status-enroute clay-badge clay-badge--info animate-pulse">
+                      EN ROUTE ({c.liveEtaMin}m remaining)
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 🚨 LIVE USER SOS TRACKING CARD */}
+      {activeDispatch && (
+        <div className="map-view__live-tracking-card clay-card">
+          <div className="map-view__card-header">
+            <div className="map-view__status-indicator">
+              <span
+                className={`map-view__live-dot ${
+                  activeLegStage === 'EN_ROUTE_PATIENT'
+                    ? 'map-view__live-dot--blue'
+                    : activeLegStage === 'PATIENT_PICKUP'
+                    ? 'map-view__live-dot--amber'
+                    : activeLegStage === 'ARRIVED_HOSPITAL'
+                    ? 'map-view__live-dot--green'
+                    : 'map-view__live-dot--red'
+                }`}
+              />
+              <div className="flex flex-col">
+                <strong className="text-xs font-bold leading-tight text-primary">
+                  {activeLegStage === 'EN_ROUTE_PATIENT' && 'Stage 1: En Route to Patient'}
+                  {activeLegStage === 'PATIENT_PICKUP' && 'Pickup: Patient Boarded'}
+                  {activeLegStage === 'RUSHING_HOSPITAL' && 'Stage 2: Rushing to Hospital'}
+                  {activeLegStage === 'ARRIVED_HOSPITAL' && 'Arrived: Emergency Admission'}
+                </strong>
+                <span className="text-3xs text-tertiary font-semibold">
+                  {activeLegStage === 'EN_ROUTE_PATIENT' && '108 Ambulance heading to patient GPS'}
+                  {activeLegStage === 'PATIENT_PICKUP' && 'Paramedic vitals triage in progress'}
+                  {activeLegStage === 'RUSHING_HOSPITAL' && `Critical transit to ${destinationHospitalName}`}
+                  {activeLegStage === 'ARRIVED_HOSPITAL' && 'Handover to Trauma & ICU Team'}
                 </span>
               </div>
             </div>
 
-            <div className="map-view__uber-eta">
-              <span className="text-xs text-secondary font-semibold">EST. ARRIVAL</span>
-              <strong className="text-lg font-black text-primary flex items-center gap-1">
-                <Clock size={16} /> {roadETA}
-              </strong>
+            <span
+              className={`clay-badge ${
+                activeLegStage === 'EN_ROUTE_PATIENT'
+                  ? 'clay-badge--info'
+                  : activeLegStage === 'PATIENT_PICKUP'
+                  ? 'clay-badge--warning'
+                  : activeLegStage === 'ARRIVED_HOSPITAL'
+                  ? 'clay-badge--success'
+                  : 'clay-badge--danger'
+              } text-3xs font-bold flex items-center gap-1`}
+            >
+              <Radio size={10} className="animate-pulse" />
+              {activeLegStage === 'EN_ROUTE_PATIENT'
+                ? 'LEG 1'
+                : activeLegStage === 'PATIENT_PICKUP'
+                ? 'PICKUP'
+                : activeLegStage === 'ARRIVED_HOSPITAL'
+                ? 'ARRIVED'
+                : 'LEG 2'}
+            </span>
+          </div>
+
+          <div className="map-view__card-body">
+            <div className="map-view__driver-pill">
+              <div className="map-view__driver-avatar">👨‍✈️</div>
+              <div className="flex flex-col">
+                <span className="text-xs font-bold text-primary">{currentDriverName}</span>
+                <span className="text-3xs text-tertiary font-semibold">{currentAmbNumber} • ALS Unit</span>
+              </div>
+            </div>
+
+            <div className="map-view__eta-box">
+              <span className="text-3xs text-tertiary font-bold uppercase">
+                {activeLegStage === 'EN_ROUTE_PATIENT' ? 'Pickup ETA' : 'Hospital ETA'}
+              </span>
+              <div
+                className={`text-sm font-black flex items-center gap-1 ${
+                  activeLegStage === 'EN_ROUTE_PATIENT'
+                    ? 'text-info'
+                    : activeLegStage === 'PATIENT_PICKUP'
+                    ? 'text-success'
+                    : activeLegStage === 'ARRIVED_HOSPITAL'
+                    ? 'text-success'
+                    : 'text-danger'
+                }`}
+              >
+                <Clock size={13} /> {liveEta > 0 ? `~${liveEta} mins` : 'Arrived ✓'}
+              </div>
+              <span className="text-3xs text-success font-bold">
+                {liveDist > 0 ? `⚡ ${liveDist} km remaining` : 'At Location 📍'}
+              </span>
             </div>
           </div>
 
-          <div className="map-view__uber-card-bottom">
-            <span className="text-xs text-secondary">
-              Distance: <strong>{roadDistance}</strong> (Real Highway Snapped)
-            </span>
-            <span className="clay-badge clay-badge--info text-xs font-bold flex items-center gap-1">
-              LIVE NAVIGATION 🟢
-            </span>
+          {/* Action Buttons */}
+          <div className="map-view__card-actions">
+            <a href={`tel:${currentPhone}`} className="clay-btn clay-btn--secondary text-xs flex items-center justify-center gap-1">
+              <Phone size={12} /> Call Pilot
+            </a>
+            <a href="tel:108" className="clay-btn clay-btn--success text-xs flex items-center justify-center gap-1">
+              <CheckCircle2 size={12} /> 108 Helpline
+            </a>
           </div>
+        </div>
+      )}
+
+      {/* Road Blocker Active Banner */}
+      {isBlockRoadMode && (
+        <div className="map-view__block-banner clay-badge clay-badge--danger">
+          <ShieldAlert size={14} className="inline mr-1" />
+          ROAD BLOCK TOOL ACTIVE — Click road segment to simulate landslide/closure
         </div>
       )}
     </div>

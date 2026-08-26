@@ -40,7 +40,16 @@ export function useDispatches() {
     const sub = liveQuery(() =>
       db.dispatches.orderBy('timestamp').reverse().limit(50).toArray()
     ).subscribe({
-      next: (data) => setDispatches(data),
+      next: (data) => {
+        // Multi-Emergency Priority Queue Ordering (P0 > P1 > P2, then newest)
+        const sorted = [...data].sort((a, b) => {
+          if (a.status === 'DISPATCHED' && b.status !== 'DISPATCHED') return -1;
+          if (b.status === 'DISPATCHED' && a.status !== 'DISPATCHED') return 1;
+          if (a.urgencyTier !== b.urgencyTier) return a.urgencyTier - b.urgencyTier;
+          return b.timestamp - a.timestamp;
+        });
+        setDispatches(sorted);
+      },
       error: (err) => console.error('Dispatch query error:', err),
     });
     return () => sub.unsubscribe();

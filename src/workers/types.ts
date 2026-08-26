@@ -1,10 +1,31 @@
 /* ── Worker Message Types ──
    Protocol for main thread ↔ pathfinding worker communication
+   Supports 2-Leg Journey, Dynamic Ambulance Allocation & Decision Telemetry
 */
 
 import type { UrgencyTier, Specialty, AlternativeHospital } from '../db/schema';
 
 // ── Requests (Main → Worker) ──
+
+export interface AmbulanceData {
+  id: number;
+  currentNodeId: number;
+  status: 'IDLE' | 'DISPATCHED' | 'EN_ROUTE' | 'RETURNING';
+  vehicleType: 'BLS' | 'ALS';
+}
+
+export interface CandidateEvaluation {
+  hospitalId: number;
+  name: string;
+  travelTime: number;
+  waitTime: number;
+  medicinePenalty: number;
+  bedPenalty: number;
+  specialtyPenalty: number;
+  totalScore: number;
+  status: 'SELECTED' | 'REJECTED';
+  reason: string;
+}
 
 export interface InitGraphMessage {
   type: 'INIT_GRAPH';
@@ -19,6 +40,7 @@ export interface InitGraphMessage {
     specialties: string[];
     medicineStock: Record<string, number>;
   }[];
+  ambulances?: AmbulanceData[];
 }
 
 export interface FindRouteMessage {
@@ -28,6 +50,7 @@ export interface FindRouteMessage {
   urgencyTier: UrgencyTier;
   requiredSpecialty?: Specialty;
   requiredMedicine?: string;
+  ambulances?: AmbulanceData[];
 }
 
 export interface UpdateEdgeMessage {
@@ -43,11 +66,19 @@ export interface UpdateHospitalMessage {
   medicineStock?: Record<string, number>;
 }
 
+export interface UpdateAmbulanceMessage {
+  type: 'UPDATE_AMBULANCE';
+  ambulanceId: number;
+  status: 'IDLE' | 'DISPATCHED' | 'EN_ROUTE' | 'RETURNING';
+  currentNodeId?: number;
+}
+
 export type WorkerRequest =
   | InitGraphMessage
   | FindRouteMessage
   | UpdateEdgeMessage
-  | UpdateHospitalMessage;
+  | UpdateHospitalMessage
+  | UpdateAmbulanceMessage;
 
 // ── Responses (Worker → Main) ──
 
@@ -56,6 +87,17 @@ export interface InitGraphResult {
   success: boolean;
   nodeCount: number;
   edgeCount: number;
+}
+
+export interface AssignedAmbulanceInfo {
+  id: number;
+  vehicleType: 'ALS' | 'BLS';
+  licensePlate: string;
+  driverName: string;
+  driverPhone: string;
+  leg1Time: number;
+  leg1Distance: number;
+  leg1Path: number[];
 }
 
 export interface RouteResult {
@@ -71,6 +113,15 @@ export interface RouteResult {
   rationale: string;
   alternativesConsidered: AlternativeHospital[];
   computeTimeMs: number;
+  // 🚀 100/100 Enhancements:
+  assignedAmbulance?: AssignedAmbulanceInfo;
+  leg1Path?: number[];
+  leg2Path?: number[];
+  leg1Time?: number;
+  leg2Time?: number;
+  totalTripTime?: number;
+  nodesExplored?: number;
+  candidateEvaluations?: CandidateEvaluation[];
 }
 
 export interface RouteError {

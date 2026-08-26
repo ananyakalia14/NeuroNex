@@ -1,0 +1,7 @@
+{
+  "name": "Vahak",
+  "description": "Intelligent 3D emergency operations, predictive triage, and geospatial dispatch platform connecting rural villages, hospitals, ambulances, and medicine supply chains.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

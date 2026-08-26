@@ -1,4 +1,4 @@
-/* ── PatientPortal — High-Accessibility Emergency SOS Portal (Full-Height Layout) ── */
+/* ── PatientPortal — Minimalist, Clean & Modern Apple/Linear Aesthetic ── */
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -8,473 +8,516 @@ import {
   PhoneCall,
   Ambulance,
   HeartPulse,
-  Activity,
   Clock,
   MapPin,
   CheckCircle2,
   Sparkles,
-  ShieldCheck,
   ChevronRight,
   BookOpen,
+  Building2,
+  Stethoscope,
+  Pill,
+  Search,
+  Bed,
+  ArrowUpRight,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { useHospitals } from '../../hooks/useDatabase';
 import type { UrgencyTier, Specialty } from '../../db/schema';
 import type { RouteResult } from '../../workers/types';
 import { formatTime, formatDistance } from '../../utils/geo';
 import './PatientPortal.css';
 
 interface PatientPortalProps {
-  onTriggerSOS: (urgency: UrgencyTier, specialty?: Specialty) => void;
+  onTriggerSOS: (urgency: UrgencyTier, specialty?: Specialty, medicine?: string) => void;
   isComputing: boolean;
   lastResult: RouteResult | null;
   activeDispatchId?: number;
+  onReset?: () => void;
 }
 
 interface TriageOption {
   id: string;
   label: string;
-  subLabel: string;
   icon: string;
   specialty: Specialty;
   urgency: UrgencyTier;
-  color: string;
 }
 
 const TRIAGE_OPTIONS: TriageOption[] = [
-  {
-    id: 'cardiac',
-    label: 'Heart / Breathing',
-    subLabel: 'छातीत दुखणे / श्वास त्रास',
-    icon: '🫀',
-    specialty: 'cardiology',
-    urgency: 1,
-    color: '#D32F2F',
-  },
-  {
-    id: 'trauma',
-    label: 'Accident / Bleeding',
-    subLabel: 'अपघात / रक्तस्त्राव',
-    icon: '🩸',
-    specialty: 'emergency',
-    urgency: 1,
-    color: '#E65100',
-  },
-  {
-    id: 'maternity',
-    label: 'Pregnancy Labor',
-    subLabel: 'प्रसूती वेदना',
-    icon: '🤰',
-    specialty: 'obstetrics',
-    urgency: 2,
-    color: '#7B1FA2',
-  },
-  {
-    id: 'fracture',
-    label: 'Bone Fracture',
-    subLabel: 'हाड मोडणे / दुखापत',
-    icon: '🦴',
-    specialty: 'orthopedics',
-    urgency: 2,
-    color: '#0288D1',
-  },
-  {
-    id: 'stroke',
-    label: 'Stroke / Paralysis',
-    subLabel: 'पक्षाघात / भोवळ',
-    icon: '🧠',
-    specialty: 'neurology',
-    urgency: 1,
-    color: '#C2185B',
-  },
-  {
-    id: 'fever',
-    label: 'Severe Infection',
-    subLabel: 'तीव्र ताप / विषबाधा',
-    icon: '🤒',
-    specialty: 'general',
-    urgency: 3,
-    color: '#388E3C',
-  },
+  { id: 'cardiac', label: 'Heart & Chest', icon: '🫀', specialty: 'cardiology', urgency: 1 },
+  { id: 'trauma', label: 'Accident / Bleeding', icon: '🩸', specialty: 'emergency', urgency: 1 },
+  { id: 'maternity', label: 'Pregnancy Labor', icon: '🤰', specialty: 'obstetrics', urgency: 2 },
+  { id: 'fracture', label: 'Bone Fracture', icon: '🦴', specialty: 'orthopedics', urgency: 2 },
+  { id: 'stroke', label: 'Stroke / Paralysis', icon: '🧠', specialty: 'neurology', urgency: 1 },
+  { id: 'fever', label: 'Severe Illness', icon: '🤒', specialty: 'general', urgency: 3 },
 ];
+
+interface SpecialistOption {
+  id: string;
+  name: string;
+  specialty: Specialty;
+  icon: string;
+  facility: string;
+  urgency: UrgencyTier;
+}
+
+const SPECIALIST_LIST: SpecialistOption[] = [
+  { id: 'cardio', name: 'Cardiologist', specialty: 'cardiology', icon: '🫀', facility: 'AIMS Hospital (24/7 ICU)', urgency: 1 },
+  { id: 'neuro', name: 'Neurologist', specialty: 'neurology', icon: '🧠', facility: 'Fortis Super-Specialty', urgency: 1 },
+  { id: 'ortho', name: 'Orthopedic Surgeon', specialty: 'orthopedics', icon: '🦴', facility: 'RR Multi-Specialty', urgency: 2 },
+  { id: 'obgyn', name: 'Gynecologist', specialty: 'obstetrics', icon: '🤰', facility: 'CSMH Hospital & Maternity', urgency: 2 },
+  { id: 'pediatric', name: 'Pediatrician', specialty: 'pediatrics', icon: '👶', facility: 'Shastri Nagar Civic ER', urgency: 2 },
+  { id: 'emergency', name: 'Trauma Surgeon', specialty: 'emergency', icon: '🚨', facility: 'AIMS Trauma Centre', urgency: 1 },
+];
+
+interface MedicineItem {
+  id: string;
+  name: string;
+  stock: string;
+  hospital: string;
+  icon: string;
+  urgency: UrgencyTier;
+}
+
+const CRITICAL_MEDICINES: MedicineItem[] = [
+  { id: 'adrenaline', name: 'Adrenaline IV', stock: '25 Vials Available', hospital: 'AIMS Trauma ER', icon: '💉', urgency: 1 },
+  { id: 'asv', name: 'Anti-Snake Venom (ASV)', stock: '15 Vials In-Stock', hospital: 'District Civil ER', icon: '🐍', urgency: 1 },
+  { id: 'blood', name: 'Blood Bank (All Groups)', stock: '32 Units Ready', hospital: 'RR Blood Centre', icon: '🩸', urgency: 1 },
+  { id: 'oxytocin', name: 'Oxytocin Ampoules', stock: '40 Ampoules Ready', hospital: 'Maternity Centre', icon: '🤰', urgency: 2 },
+  { id: 'morphine', name: 'Morphine IV Analgesic', stock: '20 Vials Ready', hospital: 'Super-Specialty ICU', icon: '💊', urgency: 2 },
+  { id: 'atropine', name: 'Atropine Antidote', stock: '30 Vials Available', hospital: 'Civic Hospital', icon: '🧪', urgency: 1 },
+];
+
+import { MUMBAI_MMR_HOSPITALS } from '../../data/mumbaiHospitals';
+
+const DEFAULT_LOCAL_HOSPITALS = MUMBAI_MMR_HOSPITALS;
+
 
 export function PatientPortal({
   onTriggerSOS,
   isComputing,
   lastResult,
+  activeDispatchId,
+  onReset,
 }: PatientPortalProps) {
-  const { profile, updateProfile } = useAuth();
+  const { profile } = useAuth();
   const { t, language } = useLanguage();
-  const [voiceEnabled, setVoiceEnabled] = useState(true);
-  const [selectedTriage, setSelectedTriage] = useState<TriageOption | null>(null);
-  const [sosDispatched, setSosDispatched] = useState(false);
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [nameInput, setNameInput] = useState(profile.name);
+  const { hospitals } = useHospitals();
+  const [voiceActive, setVoiceActive] = useState(true);
   const [showFirstAid, setShowFirstAid] = useState(false);
+  const [activeTab, setActiveTab] = useState<'hospital' | 'specialist' | 'medicine'>('hospital');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // Audio Speech Synthesis function
-  const speak = (text: string) => {
-    if (!voiceEnabled || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    try {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.95;
-      utterance.pitch = 1.0;
-      window.speechSynthesis.speak(utterance);
-    } catch {
-      // ignore
-    }
+  // Voice confirmation
+  const speakConfirmation = (text: string) => {
+    if (!voiceActive || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.05;
+    window.speechSynthesis.speak(utterance);
   };
 
-  const handleQuickSOS = (triage?: TriageOption) => {
-    const chosen = triage || TRIAGE_OPTIONS[0];
-    setSelectedTriage(chosen);
-    setSosDispatched(true);
-
-    onTriggerSOS(chosen.urgency, chosen.specialty);
-
-    const spokenPrompt =
+  const handleQuickSOS = (option: TriageOption) => {
+    const prompt =
       language === 'mr'
-        ? `${profile.name} यांच्यासाठी तातडीची रुग्णवाहिका मागवली आहे. सर्वात जवळच्या हॉस्पिटलचा मार्ग शोधत आहे.`
+        ? `तातडीची रुग्णवाहिका मागवली आहे.`
         : language === 'hi'
-        ? `${profile.name} के लिए आपातकालीन एम्बुलेंस बुलाई गई है। निकटतम अस्पताल का मार्ग खोजा जा रहा है।`
-        : `Emergency alert activated for ${profile.name}. Finding fastest route to nearest hospital.`;
-
-    speak(spokenPrompt);
+        ? `आपातकालीन एम्बुलेंस अनुरोध भेजा गया है।`
+        : `Emergency alert dispatched. Nearest ambulance is en route.`;
+    speakConfirmation(prompt);
+    onTriggerSOS(option.urgency, option.specialty);
   };
 
-  const handleReset = () => {
-    setSosDispatched(false);
-    setSelectedTriage(null);
+  const handleSpecialistRoute = (spec: SpecialistOption) => {
+    speakConfirmation(`Routing to nearest hospital with ${spec.name}.`);
+    onTriggerSOS(spec.urgency, spec.specialty);
   };
 
-  const handleSaveName = () => {
-    if (nameInput.trim()) {
-      updateProfile({ name: nameInput.trim() });
-      try {
-        localStorage.setItem('jeevraah_patient_name', nameInput.trim());
-      } catch {
-        // ignore
-      }
-    }
-    setIsEditingName(false);
+  const handleMedicineRoute = (med: MedicineItem) => {
+    speakConfirmation(`Routing to facility with ${med.name}.`);
+    onTriggerSOS(med.urgency, undefined, med.name);
   };
 
-  // Clean name without any trailing brackets
-  const cleanName = (profile.name || '')
-    .replace(/\(.*?\)/g, '')
-    .replace(/[()]/g, '')
-    .replace(/Dombivli.*/i, '')
-    .trim() || (language === 'mr' ? 'रुग्ण' : language === 'hi' ? 'मरीज' : 'Patient');
+  const isDispatched = !!activeDispatchId || !!lastResult;
+
+  const activeHospitalList = hospitals.length > 0 ? hospitals : DEFAULT_LOCAL_HOSPITALS;
+  const filteredHospitals = activeHospitalList.filter((h) => {
+    const q = searchQuery.toLowerCase();
+    const nameMatch = h.name.toLowerCase().includes(q);
+    const tierMatch = h.tier.toLowerCase().includes(q);
+    const locationMatch = (h as any).location?.toLowerCase()?.includes(q);
+    const areaMatch = (h as any).administrativeArea?.toLowerCase()?.includes(q);
+    return nameMatch || tierMatch || locationMatch || areaMatch;
+  });
+
+  const filteredSpecialists = SPECIALIST_LIST.filter((s) =>
+    s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.facility.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredMedicines = CRITICAL_MEDICINES.filter((m) =>
+    m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    m.hospital.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="patient-portal" id="patient-portal">
-      {/* ── 1. Patient Health ID Header ── */}
-      <div className="patient-portal__card clay-card">
-        <div className="patient-portal__id-bar">
-          <div className="patient-portal__user-info">
-            <div className="patient-portal__avatar">{profile.avatar}</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              {isEditingName ? (
-                <div className="flex items-center gap-1">
-                  <input
-                    type="text"
-                    className="patient-portal__name-edit-input clay-card--inset"
-                    value={nameInput}
-                    onChange={(e) => setNameInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleSaveName();
-                    }}
-                    autoFocus
-                  />
-                  <button
-                    className="clay-btn clay-btn--primary clay-btn--sm"
-                    onClick={handleSaveName}
-                    style={{ padding: '2px 8px', fontSize: 11 }}
-                  >
-                    ✓
-                  </button>
-                </div>
-              ) : (
-                <h2
-                  className="patient-portal__name flex items-center gap-1"
-                  onClick={() => setIsEditingName(true)}
-                  title="Click to edit name"
-                >
-                  <span className="truncate">{cleanName}</span>
-                  <span style={{ fontSize: 11, opacity: 0.6 }}>✏️</span>
-                </h2>
-              )}
-              <p className="patient-portal__location">
-                <MapPin size={12} /> {profile.villageName || 'Dombivli East (Manpada Rd)'} • {profile.phone || '+91 98330 54321'}
-              </p>
-            </div>
-          </div>
-
-          <div className="patient-portal__voice-toggle">
-            <button
-              className={`clay-btn clay-btn--icon ${voiceEnabled ? 'clay-btn--primary' : 'clay-btn--ghost'}`}
-              onClick={() => {
-                const next = !voiceEnabled;
-                setVoiceEnabled(next);
-                if (next) speak(language === 'mr' ? 'आवाज मार्गदर्शन चालू केले.' : 'Voice assistance active.');
-              }}
-              title={voiceEnabled ? 'Voice Assistance On' : 'Voice Assistance Off'}
-            >
-              {voiceEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-            </button>
-          </div>
-        </div>
-      </div>
-
+    <div className="patient-portal">
       <AnimatePresence mode="wait">
-        {!sosDispatched ? (
-          /* Normal SOS Mode */
+        {!isDispatched ? (
           <motion.div
-            key="sos-mode"
-            className="patient-portal__action-area"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
+            key="idle"
+            className="patient-portal__container"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
           >
-            {/* ── 2. Master Emergency SOS Button ── */}
+            {/* ── 1. Minimal Header ── */}
+            <header className="patient-portal__header">
+              <div className="patient-portal__header-left">
+                <div className="patient-portal__header-status">
+                  <span className="patient-portal__status-dot" />
+                  <h1 className="patient-portal__heading">Emergency SOS</h1>
+                </div>
+                <div className="patient-portal__sub-location">
+                  <MapPin size={12} className="text-slate-400" />
+                  <span>{profile.villageName || 'Live GPS Sector (India)'}</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className={`patient-portal__icon-btn ${voiceActive ? 'patient-portal__icon-btn--active' : ''}`}
+                onClick={() => setVoiceActive(!voiceActive)}
+                title={voiceActive ? 'Mute Voice' : 'Unmute Voice'}
+              >
+                {voiceActive ? <Volume2 size={15} /> : <VolumeX size={15} />}
+              </button>
+            </header>
+
+            {/* ── 2. Master Emergency SOS Action ── */}
             <button
-              className="patient-portal__big-sos"
+              type="button"
+              className="patient-portal__hero-sos"
               onClick={() => handleQuickSOS(TRIAGE_OPTIONS[0])}
               id="patient-big-sos-btn"
             >
-              <div className="patient-portal__big-sos-pulse" />
-              <div className="patient-portal__big-sos-content">
-                <div className="patient-portal__sos-icon-circle">
-                  <HeartPulse size={28} className="patient-portal__sos-icon" />
+              <div className="patient-portal__hero-sos-left">
+                <div className="patient-portal__hero-icon-box">
+                  <HeartPulse size={20} className="patient-portal__hero-icon" />
                 </div>
-                <div className="patient-portal__sos-text-box">
-                  <span className="patient-portal__sos-text">{t('masterSosBtn')}</span>
-                  <span className="patient-portal__sos-sub">{t('masterSosSub')}</span>
+                <div className="patient-portal__hero-text">
+                  <span className="patient-portal__hero-title">1-Tap Emergency SOS</span>
+                  <span className="patient-portal__hero-caption">Instant 108 Ambulance & Nearest Hospital</span>
                 </div>
               </div>
+              <ArrowUpRight size={18} className="patient-portal__hero-arrow" />
             </button>
 
-            {/* ── 3. Balanced 2-Column Pictorial Triage Cards ── */}
-            <div className="patient-portal__triage-section">
-              <h3 className="patient-portal__section-title">
-                <Activity size={15} /> {t('selectEmergencyType')}
-              </h3>
-
+            {/* ── 3. Clean Medical Triage Grid ── */}
+            <div className="patient-portal__triage-block">
+              <span className="patient-portal__section-label">Select Medical Condition</span>
               <div className="patient-portal__triage-grid">
-                {TRIAGE_OPTIONS.map((tr) => (
+                {TRIAGE_OPTIONS.map((opt) => (
                   <button
-                    key={tr.id}
-                    className="patient-portal__triage-card clay-card--flat"
-                    onClick={() => handleQuickSOS(tr)}
-                    style={{ borderLeft: `4px solid ${tr.color}` }}
+                    key={opt.id}
+                    type="button"
+                    className="patient-portal__triage-card"
+                    onClick={() => handleQuickSOS(opt)}
                   >
-                    <span className="patient-portal__triage-emoji">{tr.icon}</span>
-                    <div className="patient-portal__triage-details">
-                      <strong className="patient-portal__triage-label">{tr.label}</strong>
-                      <span className="patient-portal__triage-sub">{tr.subLabel}</span>
-                    </div>
+                    <span className="patient-portal__triage-icon">{opt.icon}</span>
+                    <span className="patient-portal__triage-name">{opt.label}</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* ── 4. Live Emergency Readiness Card (Fills Full Height) ── */}
-            <div className="patient-portal__readiness-card clay-card">
-              <div className="flex items-center justify-between pb-2 border-b border-black/5">
-                <span className="text-xs font-bold text-success flex items-center gap-1">
-                  <ShieldCheck size={14} /> LIVE READINESS (DOMBIVLI SECTOR)
-                </span>
-                <span className="text-xs text-tertiary">A* Online</span>
+            {/* ── 4. Unified Discovery Card (Hospitals, Specialists, Medicines) ── */}
+            <div className="patient-portal__discovery-card">
+              {/* Segmented Control Tabs */}
+              <div className="patient-portal__tabs">
+                <button
+                  type="button"
+                  className={`patient-portal__tab-btn ${activeTab === 'hospital' ? 'patient-portal__tab-btn--active' : ''}`}
+                  onClick={() => {
+                    setActiveTab('hospital');
+                    setSearchQuery('');
+                  }}
+                >
+                  <Building2 size={13} />
+                  <span>Hospitals ({filteredHospitals.length})</span>
+                </button>
+                <button
+                  type="button"
+                  className={`patient-portal__tab-btn ${activeTab === 'specialist' ? 'patient-portal__tab-btn--active' : ''}`}
+                  onClick={() => {
+                    setActiveTab('specialist');
+                    setSearchQuery('');
+                  }}
+                >
+                  <Stethoscope size={13} />
+                  <span>Specialists</span>
+
+                </button>
+                <button
+                  type="button"
+                  className={`patient-portal__tab-btn ${activeTab === 'medicine' ? 'patient-portal__tab-btn--active' : ''}`}
+                  onClick={() => {
+                    setActiveTab('medicine');
+                    setSearchQuery('');
+                  }}
+                >
+                  <Pill size={13} />
+                  <span>Medicines</span>
+                </button>
               </div>
 
-              <div className="patient-portal__readiness-list">
-                <div className="patient-portal__readiness-item">
-                  <div className="flex items-center gap-2">
-                    <div className="patient-portal__mini-badge bg-danger-pale text-danger">🚑</div>
-                    <div>
-                      <strong className="text-xs">MH-05-EM-1080 (ALS Pilot)</strong>
-                      <p className="text-2xs text-secondary">0.8 km • ~3 mins response time</p>
-                    </div>
-                  </div>
-                  <span className="clay-badge clay-badge--success text-2xs font-black">STANDBY</span>
-                </div>
-
-                <div className="patient-portal__readiness-item">
-                  <div className="flex items-center gap-2">
-                    <div className="patient-portal__mini-badge bg-primary-pale text-primary">🏥</div>
-                    <div>
-                      <strong className="text-xs">AIMS Hospital & ICU</strong>
-                      <p className="text-2xs text-secondary">14 ICU Beds • 24/7 Trauma Desk</p>
-                    </div>
-                  </div>
-                  <span className="clay-badge clay-badge--info text-2xs font-black">OPEN</span>
-                </div>
-
-                <div className="patient-portal__readiness-item">
-                  <div className="flex items-center gap-2">
-                    <div className="patient-portal__mini-badge bg-warning-pale text-warning">🩸</div>
-                    <div>
-                      <strong className="text-xs">RR Multi-Specialty Blood Bank</strong>
-                      <p className="text-2xs text-secondary">B+, O+, A+ Units In-Stock</p>
-                    </div>
-                  </div>
-                  <span className="clay-badge clay-badge--success text-2xs font-black">VERIFIED</span>
-                </div>
+              {/* Minimal Search Bar */}
+              <div className="patient-portal__search-wrap">
+                <Search size={13} className="patient-portal__search-icon" />
+                <input
+                  type="text"
+                  className="patient-portal__search-field"
+                  placeholder={
+                    activeTab === 'hospital'
+                      ? 'Search by name, area (e.g. Bandra, Vashi, Fort)...'
+                      : activeTab === 'specialist'
+                      ? 'Search specialist doctor...'
+                      : 'Search emergency medicine...'
+                  }
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
-            </div>
 
-            {/* ── 5. Offline Emergency First-Aid Guide Toggle ── */}
-            <div className="patient-portal__firstaid-toggle-card clay-card--flat">
-              <button
-                type="button"
-                className="patient-portal__firstaid-btn"
-                onClick={() => setShowFirstAid(!showFirstAid)}
-              >
-                <div className="flex items-center gap-2">
-                  <BookOpen size={16} className="text-primary" />
-                  <span className="text-xs font-bold text-dark">
-                    {language === 'mr' ? 'आपत्कालीन प्रथमोपचार टिप्स (Offline Guide)' : language === 'hi' ? 'आपातकालीन प्राथमिक उपचार (Offline Guide)' : 'Emergency First-Aid Quick Guide'}
-                  </span>
+              {/* TAB 1: HOSPITALS */}
+              {activeTab === 'hospital' && (
+                <div className="patient-portal__list">
+                  {filteredHospitals.map((h) => (
+                    <div key={h.id} className="patient-portal__row">
+                      <div className="patient-portal__row-left">
+                        <div className="patient-portal__row-header">
+                          <span className="patient-portal__row-title">{h.name}</span>
+                          <span className="patient-portal__tag">{h.tier}</span>
+                        </div>
+                        <div className="patient-portal__row-meta">
+                          <span className="patient-portal__bed-text">
+                            <Bed size={11} /> {h.bedsAvailable} Beds Ready
+                          </span>
+                          <span className="patient-portal__bullet">•</span>
+                          <span className="patient-portal__spec-text">{h.specialties.slice(0, 2).join(', ')}</span>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="patient-portal__btn-action"
+                        onClick={() => onTriggerSOS(1)}
+                      >
+                        Route
+                      </button>
+                    </div>
+                  ))}
                 </div>
-                <ChevronRight size={16} className={`text-tertiary transition-transform ${showFirstAid ? 'rotate-90' : ''}`} />
-              </button>
+              )}
 
-              {showFirstAid && (
-                <div className="patient-portal__firstaid-content mt-2 pt-2 border-t border-black/5 text-xs text-secondary flex flex-col gap-2">
-                  <div className="p-2 rounded bg-black/2">
-                    <strong className="text-dark block mb-1">🫀 CPR / श्वास थांबल्यास:</strong>
-                    छातीच्या मध्यभागी ३० वेळा जोराने दाबा (100-120 प्रति मिनिट), २ वेळा कृत्रिम श्वास द्या.
-                  </div>
-                  <div className="p-2 rounded bg-black/2">
-                    <strong className="text-dark block mb-1">🩸 Severe Bleeding / रक्तस्त्राव:</strong>
-                    जखमेवर स्वच्छ कापडाने थेट दाब द्या आणि जखमी भाग हृदयाच्या वर उचला.
-                  </div>
-                  <div className="p-2 rounded bg-black/2">
-                    <strong className="text-dark block mb-1">🧘 Fainting / चक्कर:</strong>
-                    रुग्णाला पाठीवर झोपवून पाय थोडे वर उचला आणि हवा येऊ द्या.
-                  </div>
+              {/* TAB 2: SPECIALISTS */}
+              {activeTab === 'specialist' && (
+                <div className="patient-portal__list">
+                  {filteredSpecialists.map((s) => (
+                    <div key={s.id} className="patient-portal__row">
+                      <div className="patient-portal__row-left">
+                        <div className="patient-portal__row-header">
+                          <span className="text-xs mr-1">{s.icon}</span>
+                          <span className="patient-portal__row-title">{s.name}</span>
+                        </div>
+                        <span className="patient-portal__facility-text">{s.facility}</span>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="patient-portal__btn-action patient-portal__btn-action--danger"
+                        onClick={() => handleSpecialistRoute(s)}
+                      >
+                        Select
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* TAB 3: MEDICINES */}
+              {activeTab === 'medicine' && (
+                <div className="patient-portal__list">
+                  {filteredMedicines.map((m) => (
+                    <div key={m.id} className="patient-portal__row">
+                      <div className="patient-portal__row-left">
+                        <div className="patient-portal__row-header">
+                          <span className="text-xs mr-1">{m.icon}</span>
+                          <span className="patient-portal__row-title">{m.name}</span>
+                        </div>
+                        <div className="patient-portal__row-meta">
+                          <span className="patient-portal__stock-text">{m.stock}</span>
+                          <span className="patient-portal__bullet">•</span>
+                          <span className="patient-portal__facility-text">{m.hospital}</span>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="patient-portal__btn-action patient-portal__btn-action--green"
+                        onClick={() => handleMedicineRoute(m)}
+                      >
+                        Route
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* ── 6. Emergency Helpline Banner ── */}
-            <div className="patient-portal__hotline clay-card--inset">
-              <PhoneCall size={16} className="text-danger" />
-              <div>
-                <strong>National Toll-Free Helpline: 108 / 112</strong>
-                <p className="text-xs text-tertiary">Direct offline satellite & local emergency relay</p>
-              </div>
+            {/* ── 5. Minimal First-Aid Toggle ── */}
+            <div className="patient-portal__firstaid-wrap">
+              <button
+                type="button"
+                className="patient-portal__firstaid-header"
+                onClick={() => setShowFirstAid(!showFirstAid)}
+              >
+                <div className="flex items-center gap-2">
+                  <BookOpen size={13} className="text-slate-500" />
+                  <span className="text-xs font-semibold text-slate-700">First-Aid Emergency Guide</span>
+                </div>
+                <ChevronRight size={13} className={`text-slate-400 transition-transform ${showFirstAid ? 'rotate-90' : ''}`} />
+              </button>
+
+              {showFirstAid && (
+                <div className="patient-portal__firstaid-body">
+                  <p><strong>🫀 CPR:</strong> Push hard & fast in center of chest (100-120/min), give 2 rescue breaths.</p>
+                  <p><strong>🩸 Bleeding:</strong> Apply direct firm pressure with clean cloth, elevate wound above heart.</p>
+                  <p><strong>🧘 Fainting:</strong> Lay patient flat, elevate legs 12 inches, ensure fresh air flow.</p>
+                </div>
+              )}
             </div>
+
+            {/* ── 6. Minimal Hotline Bar ── */}
+            <footer className="patient-portal__footer">
+              <div className="flex items-center gap-2">
+                <PhoneCall size={14} className="text-slate-500" />
+                <div className="flex flex-col text-left">
+                  <span className="text-3xs text-slate-400 font-medium tracking-wide uppercase">Toll-Free Helpline</span>
+                  <span className="text-xs font-bold text-slate-800">108 / 112 Emergency</span>
+                </div>
+              </div>
+              <a href="tel:108" className="patient-portal__call-pill">
+                Call 108
+              </a>
+            </footer>
           </motion.div>
         ) : (
-          /* Active Emergency Dispatched Screen */
+          /* ── DISPATCHED STATE (MINIMALIST APPLE TRACKER) ── */
           <motion.div
-            key="dispatched-mode"
+            key="dispatched"
             className="patient-portal__dispatched"
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.96 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            {isComputing ? (
-              <div className="patient-portal__computing clay-card">
-                <div className="pulse-dot pulse-dot--danger" style={{ width: 20, height: 20 }} />
-                <h3 className="text-sm font-bold mt-2">{t('findingRoute')}</h3>
-                <p className="text-xs text-secondary">A* algorithm finding fastest road route</p>
+            {/* Live Status Card */}
+            <div className="patient-portal__active-card">
+              <div className="flex items-center justify-between w-full">
+                <span className="patient-portal__status-badge">
+                  🚨 Ambulance Dispatched
+                </span>
+                <span className="text-2xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                  GPS Live
+                </span>
               </div>
-            ) : lastResult ? (
-              <div className="patient-portal__active-card clay-card">
-                <div className="patient-portal__active-header">
-                  <span className="clay-badge clay-badge--danger font-bold text-xs">
-                    <Ambulance size={14} /> {t('dispatchedStatus')}
-                  </span>
-                  <button
-                    className="patient-portal__audio-repeat clay-btn clay-btn--icon"
-                    onClick={() =>
-                      speak(
-                        `Ambulance is en route to ${lastResult.hospitalName}. Estimated arrival time is ${formatTime(
-                          lastResult.totalTime
-                        )}.`
-                      )
-                    }
-                    title="Listen status"
-                  >
-                    <Volume2 size={15} />
-                  </button>
-                </div>
 
-                {selectedTriage && (
-                  <span className="clay-badge clay-badge--warning text-xs">
-                    Condition: {selectedTriage.icon} {selectedTriage.label}
-                  </span>
-                )}
-
-                <div className="patient-portal__radar">
-                  <div className="patient-portal__radar-circle patient-portal__radar-circle--3" />
-                  <div className="patient-portal__radar-circle patient-portal__radar-circle--2" />
-                  <div className="patient-portal__radar-circle patient-portal__radar-circle--1" />
-                  <Ambulance size={28} className="patient-portal__radar-amb" />
-                </div>
-
-                <div className="patient-portal__eta-box">
-                  <span className="text-xs text-secondary font-bold uppercase">{t('estimatedArrival')}</span>
-                  <div className="patient-portal__eta-num text-success">
-                    <Clock size={24} /> {formatTime(lastResult.totalTime)}
-                  </div>
-                  <span className="text-xs text-tertiary">{t('distance')}: {formatDistance(lastResult.totalDistance)}</span>
-                </div>
-
-                {/* 🚑 Assigned 108 Ambulance Pilot Card */}
-                <div className="patient-portal__driver-card clay-card--flat">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="patient-portal__avatar" style={{ width: 34, height: 34, fontSize: 18 }}>🚑</div>
-                      <div>
-                        <strong className="text-xs font-bold">Santosh Shinde (108 Pilot)</strong>
-                        <p className="text-xs text-secondary">MH-05-EM-1080 (ALS)</p>
-                      </div>
-                    </div>
-                    <span className="clay-badge clay-badge--danger text-xs font-black">EN ROUTE</span>
-                  </div>
-
-                  <a
-                    href="tel:9820011080"
-                    className="clay-btn clay-btn--danger clay-btn--md w-full flex items-center justify-center gap-2 mt-2"
-                    style={{ textDecoration: 'none', fontWeight: 800, fontSize: 12, padding: '8px 12px' }}
-                  >
-                    <PhoneCall size={14} />
-                    <span>{language === 'mr' ? 'चालकाशी थेट बोला (+91 98200 11080)' : language === 'hi' ? 'एम्बुलेंस चालक को कॉल करें (+91 98200 11080)' : 'CALL AMBULANCE PILOT (+91 98200 11080)'}</span>
-                  </a>
-                </div>
-
-                <div className="patient-portal__hospital-assigned clay-card--inset">
-                  <div className="patient-portal__hosp-info">
-                    <strong className="text-sm font-bold">{lastResult.hospitalName}</strong>
-                    <span className="text-xs text-secondary">{t('assignedFacility')}</span>
-                  </div>
-                  <CheckCircle2 size={20} className="text-success" />
-                </div>
-
-                {/* First Aid tips */}
-                <div className="patient-portal__first-aid">
-                  <h4 className="text-xs font-bold flex items-center gap-1">
-                    <Sparkles size={12} className="text-warning" /> {t('whileYouWait')}
-                  </h4>
-                  <ul className="patient-portal__first-aid-list text-xs">
-                    <li>• {t('tip1')}</li>
-                    <li>• {t('tip2')}</li>
-                    <li>• {t('tip3')}</li>
-                  </ul>
-                </div>
-
-                <button
-                  className="clay-btn clay-btn--md clay-btn--secondary w-full"
-                  onClick={handleReset}
-                >
-                  {t('closeAndNew')}
-                </button>
+              <div className="patient-portal__ambulance-icon-wrap">
+                <Ambulance size={28} className="text-red-600 animate-pulse" />
               </div>
-            ) : null}
+
+              {lastResult ? (
+                <div className="w-full flex flex-col gap-2">
+                  <div className="patient-portal__metric-row">
+                    <span className="patient-portal__metric-label">
+                      <Clock size={12} /> Estimated Arrival
+                    </span>
+                    <strong className="patient-portal__metric-val text-red-600">
+                      ~{formatTime(lastResult.totalTime)}
+                    </strong>
+                  </div>
+
+                  <div className="patient-portal__metric-row">
+                    <span className="patient-portal__metric-label">
+                      <MapPin size={12} /> Distance
+                    </span>
+                    <strong className="patient-portal__metric-val text-slate-800">
+                      {formatDistance(lastResult.totalDistance)}
+                    </strong>
+                  </div>
+
+                  <div className="patient-portal__hosp-box">
+                    <span className="text-3xs text-slate-500 font-bold uppercase tracking-wider block">
+                      Destination Facility
+                    </span>
+                    <strong className="text-xs text-slate-900 block mt-0.5">
+                      {lastResult.hospitalName}
+                    </strong>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <Sparkles size={13} className="animate-spin" />
+                  <span>{isComputing ? t('findingRoute') : 'Locking optimal route...'}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Pilot Calling Box */}
+            <div className="patient-portal__driver-box">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <CheckCircle2 size={13} className="text-emerald-500" /> Assigned 108 Pilot
+                </span>
+                <span className="text-3xs font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                  EN ROUTE
+                </span>
+              </div>
+
+              <div className="mt-2 flex items-center justify-between">
+                <div>
+                  <strong className="text-xs text-slate-800 block">Santosh Shinde</strong>
+                  <span className="text-3xs text-slate-500">MH-05-EM-1080 (ALS Unit)</span>
+                </div>
+              </div>
+
+              <a
+                href="tel:9820011080"
+                className="patient-portal__call-driver-action"
+                id="patient-call-driver-btn"
+              >
+                <PhoneCall size={14} />
+                <span>Call Pilot (+91 98200 11080)</span>
+              </a>
+            </div>
+
+            {/* Reset Button */}
+            <button
+              type="button"
+              className="patient-portal__btn-reset"
+              onClick={() => {
+                if (onReset) {
+                  onReset();
+                } else {
+                  window.location.reload();
+                }
+              }}
+            >
+              New Request / Reset
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

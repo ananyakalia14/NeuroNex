@@ -10,7 +10,14 @@ interface AuthContextType {
   profile: UserProfile;
   role: UserRole;
   isAuthenticated: boolean;
-  loginAsPatient: (villageNodeId?: number, patientName?: string, patientPhone?: string) => void;
+  loginAsPatient: (
+    villageNodeId?: number,
+    patientName?: string,
+    patientPhone?: string,
+    villageName?: string,
+    lat?: number,
+    lng?: number
+  ) => void;
   loginAsHospital: (hospitalId?: number, doctorName?: string) => void;
   loginAsAdmin: (adminName?: string) => void;
   loginAsDriver: (ambulanceId?: number, driverName?: string, vehicleNumber?: string) => void;
@@ -48,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     try {
-      const auth = localStorage.getItem(STORAGE_AUTH_KEY);
+      const auth = sessionStorage.getItem(STORAGE_AUTH_KEY);
       return auth === 'true';
     } catch {
       return false;
@@ -58,18 +65,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_PROFILE_KEY, JSON.stringify(profile));
-      localStorage.setItem(STORAGE_AUTH_KEY, isAuthenticated ? 'true' : 'false');
+      sessionStorage.setItem(STORAGE_AUTH_KEY, isAuthenticated ? 'true' : 'false');
     } catch {
       // ignore
     }
   }, [profile, isAuthenticated]);
 
-  const loginAsPatient = (villageNodeId?: number, patientName?: string, patientPhone?: string) => {
+  const loginAsPatient = (
+    villageNodeId?: number,
+    patientName?: string,
+    patientPhone?: string,
+    villageName?: string,
+    lat?: number,
+    lng?: number
+  ) => {
     const patientProfile: UserProfile = {
       ...DEMO_PROFILES[0],
       name: patientName || DEMO_PROFILES[0].name,
       villageNodeId: villageNodeId || DEMO_PROFILES[0].villageNodeId,
       phone: patientPhone || DEMO_PROFILES[0].phone,
+      villageName: villageName || DEMO_PROFILES[0].villageName,
+      lat: lat ?? DEMO_PROFILES[0].lat,
+      lng: lng ?? DEMO_PROFILES[0].lng,
     };
     setProfile(patientProfile);
     setIsAuthenticated(true);
@@ -119,6 +136,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setIsAuthenticated(false);
+    try {
+      sessionStorage.removeItem(STORAGE_AUTH_KEY);
+    } catch {
+      // ignore
+    }
   };
 
   return (
