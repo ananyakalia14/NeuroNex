@@ -7,7 +7,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 56px var(--sp-4) var(--sp-8);
+  padding: 42px var(--sp-4) var(--sp-8);
   /* Matching Light Green Radial Background */
   background: radial-gradient(circle at 50% 25%, #FAFCF8 0%, #F1F8E9 40%, #E8F5E9 80%, #DCEDC8 100%);
   position: relative;
@@ -50,10 +50,10 @@
 
 .login-page__container {
   width: 100%;
-  max-width: 500px;
+  max-width: 520px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   position: relative;
   z-index: 10;
   margin: auto 0;
@@ -68,11 +68,12 @@
 }
 
 .login-page__logo {
-  width: min(65vw, 240px);
-  max-height: 105px;
+  width: min(85vw, 360px);
+  max-height: 170px;
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 6px 18px rgba(27, 94, 32, 0.12));
+  filter: drop-shadow(0 10px 26px rgba(27, 94, 32, 0.16));
+  transition: transform var(--transition-base);
 }
 
 /* ── 1. Patient Big SOS Box ── */
