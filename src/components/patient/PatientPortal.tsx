@@ -49,16 +49,18 @@ interface TriageOption {
   icon: string;
   specialty: Specialty;
   urgency: UrgencyTier;
+  targetHospitalId?: number;
 }
 
 const TRIAGE_OPTIONS: TriageOption[] = [
-  { id: 'cardiac', label: 'Heart & Chest', icon: '🫀', specialty: 'cardiology', urgency: 1 },
-  { id: 'trauma', label: 'Accident / Bleeding', icon: '🩸', specialty: 'emergency', urgency: 1 },
-  { id: 'maternity', label: 'Pregnancy Labor', icon: '🤰', specialty: 'obstetrics', urgency: 2 },
-  { id: 'fracture', label: 'Bone Fracture', icon: '🦴', specialty: 'orthopedics', urgency: 2 },
-  { id: 'stroke', label: 'Stroke / Paralysis', icon: '🧠', specialty: 'neurology', urgency: 1 },
-  { id: 'fever', label: 'Severe Illness', icon: '🤒', specialty: 'general', urgency: 3 },
+  { id: 'cardiac', label: 'Heart & Chest', icon: '🫀', specialty: 'cardiology', urgency: 1, targetHospitalId: 0 },
+  { id: 'trauma', label: 'Accident / Bleeding', icon: '🩸', specialty: 'emergency', urgency: 1, targetHospitalId: 4 },
+  { id: 'maternity', label: 'Pregnancy Labor', icon: '🤰', specialty: 'obstetrics', urgency: 2, targetHospitalId: 1 },
+  { id: 'fracture', label: 'Bone Fracture', icon: '🦴', specialty: 'orthopedics', urgency: 2, targetHospitalId: 2 },
+  { id: 'stroke', label: 'Stroke / Paralysis', icon: '🧠', specialty: 'neurology', urgency: 1, targetHospitalId: 2 },
+  { id: 'fever', label: 'Severe Illness', icon: '🤒', specialty: 'general', urgency: 3, targetHospitalId: 0 },
 ];
+
 
 interface SpecialistOption {
   id: string;
@@ -150,16 +152,38 @@ export function PatientPortal({
     } catch {}
   };
 
-  const handleQuickSOS = (option: TriageOption) => {
+  const handleQuickSOS = (option: any) => {
+    const targetHId = option.targetHospitalId ?? 0;
+    const targetH = MUMBAI_MMR_HOSPITALS.find((h) => h.id === targetHId) || MUMBAI_MMR_HOSPITALS[0];
+    setHighlightedHospId(targetHId);
+    onSelectHospitalPin?.(targetHId);
+
     const prompt =
       language === 'mr'
         ? `तातडीची रुग्णवाहिका मागवली आहे.`
         : language === 'hi'
         ? `आपातकालीन एम्बुलेंस अनुरोध भेजा गया है।`
-        : `Emergency alert dispatched. Nearest ambulance is en route.`;
+        : `Emergency route locked to ${targetH.name.split('(')[0].trim()} for ${option.label}.`;
     speakConfirmation(prompt);
-    onTriggerSOS(option.urgency, option.specialty);
+    onTriggerSOS(option.urgency, option.specialty, undefined, targetHId);
   };
+
+  const handleMasterSOS = () => {
+    const nearestHosp = filteredHospitals[0] || activeHospitalList[0] || MUMBAI_MMR_HOSPITALS[0];
+    const targetHId = nearestHosp.id ?? 0;
+    setHighlightedHospId(targetHId);
+    onSelectHospitalPin?.(targetHId);
+
+    const prompt =
+      language === 'mr'
+        ? `तातडीची 108 रुग्णवाहिका मागवली आहे.`
+        : language === 'hi'
+        ? `108 आपातकालीन एम्बुलेंस भेज दी गई है।`
+        : `1-Tap SOS dispatched! Nearest 108 ambulance is en route to ${nearestHosp.name.split('(')[0].trim()}.`;
+    speakConfirmation(prompt);
+    onTriggerSOS(1, undefined, undefined, targetHId);
+  };
+
 
   const handleHospitalRoute = (h: any) => {
     setHighlightedHospId(h.id);
@@ -238,6 +262,14 @@ export function PatientPortal({
     )
     .sort((a, b) => a.distKm - b.distKm);
 
+  const triageOptionsWithDistance = TRIAGE_OPTIONS.map((opt) => {
+    const targetId = opt.targetHospitalId ?? 0;
+    const coord = MUMBAI_HOSPITAL_COORDINATES[targetId] || { lat: 19.2125, lng: 73.0933 };
+    const dist = calculateDistanceKm(curLat, curLng, coord.lat, coord.lng);
+    const eta = Math.max(3, Math.round(dist * 2.1));
+    return { ...opt, distKm: dist, etaMin: eta };
+  });
+
 
   return (
     <div className="patient-portal">
@@ -296,7 +328,7 @@ export function PatientPortal({
             <button
               type="button"
               className="patient-portal__hero-sos"
-              onClick={() => handleQuickSOS(TRIAGE_OPTIONS[0])}
+              onClick={handleMasterSOS}
               id="patient-big-sos-btn"
             >
               <div className="patient-portal__hero-sos-left">
@@ -315,15 +347,19 @@ export function PatientPortal({
             <div className="patient-portal__triage-block">
               <span className="patient-portal__section-label">Select Medical Condition</span>
               <div className="patient-portal__triage-grid">
-                {TRIAGE_OPTIONS.map((opt) => (
+                {triageOptionsWithDistance.map((opt) => (
                   <button
                     key={opt.id}
                     type="button"
-                    className="patient-portal__triage-card"
+                    className={`patient-portal__triage-card ${highlightedHospId === opt.targetHospitalId ? 'patient-portal__triage-card--active' : ''}`}
                     onClick={() => handleQuickSOS(opt)}
+                    title={`Emergency route for ${opt.label} • Dist: ${opt.distKm} km • ETA: ~${opt.etaMin}m`}
                   >
                     <span className="patient-portal__triage-icon">{opt.icon}</span>
-                    <span className="patient-portal__triage-name">{opt.label}</span>
+                    <div className="patient-portal__triage-info">
+                      <span className="patient-portal__triage-name">{opt.label}</span>
+                      <span className="patient-portal__triage-dist">⚡ {opt.distKm}km • ~{opt.etaMin}m</span>
+                    </div>
                   </button>
                 ))}
               </div>

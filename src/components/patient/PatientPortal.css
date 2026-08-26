@@ -213,10 +213,24 @@
   transform: translateY(-1px);
 }
 
+.patient-portal__triage-card--active {
+  background: #eff6ff !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 1px #3b82f6 !important;
+}
+
 .patient-portal__triage-icon,
 .patient-portal__triage-emoji {
   font-size: 15px;
   flex-shrink: 0;
+}
+
+.patient-portal__triage-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  flex: 1;
 }
 
 .patient-portal__triage-name {
@@ -226,7 +240,17 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.2;
 }
+
+.patient-portal__triage-dist {
+  font-size: 9.5px;
+  color: #64748b;
+  font-weight: 500;
+  line-height: 1.1;
+  margin-top: 1px;
+}
+
 
 /* ── 4. Unified Discovery Card (Hospitals, Specialists, Medicines) ── */
 .patient-portal__discovery-card,
