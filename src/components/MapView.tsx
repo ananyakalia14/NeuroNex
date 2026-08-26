@@ -579,10 +579,13 @@ export function MapView({
 
     const depotCoord: [number, number] = [patientLat + 0.0038, patientLng + 0.0040];
     const patientCoord: [number, number] = [patientLat, patientLng];
-    const targetHosp = hospitals.find((h) => h.id === activeDispatch.assignedHospitalId) || hospitals[0] || DEFAULT_HOSPITALS[0];
-    const hospCoordObj = REAL_HOSPITAL_COORDS[targetHosp.id] || REAL_HOSPITAL_COORDS[0];
+    const targetHosp = MUMBAI_MMR_HOSPITALS.find((h) => h.id === activeDispatch.assignedHospitalId) ||
+                       hospitals.find((h) => h.id === activeDispatch.assignedHospitalId) ||
+                       DEFAULT_HOSPITALS[0];
+    const hospCoordObj = MUMBAI_HOSPITAL_COORDINATES[targetHosp.id] ||
+                         { lat: (targetHosp as any).lat, lng: (targetHosp as any).lng } ||
+                         REAL_HOSPITAL_COORDS[0];
     const hospCoord: [number, number] = [hospCoordObj.lat, hospCoordObj.lng];
-
 
     const leg1MidLat = (depotCoord[0] + patientCoord[0]) / 2;
     const leg1MidLng = (depotCoord[1] + patientCoord[1]) / 2 + 0.001;
@@ -594,16 +597,19 @@ export function MapView({
       patientCoord,
     ];
 
-    const leg2MidLat = (patientCoord[0] + hospCoord[0]) / 2;
-    const leg2MidLng = (patientCoord[1] + hospCoord[1]) / 2;
+    const pLat = patientCoord[0];
+    const pLng = patientCoord[1];
+    const hLat = hospCoord[0];
+    const hLng = hospCoord[1];
 
     const leg2Path: [number, number][] = [
-      patientCoord,
-      [patientCoord[0] + (leg2MidLat - patientCoord[0]) * 0.5, patientCoord[1] + (leg2MidLng - patientCoord[1]) * 0.5 + 0.002],
-      [leg2MidLat, leg2MidLng],
-      [hospCoord[0] - (hospCoord[0] - leg2MidLat) * 0.5, hospCoord[1] - (hospCoord[1] - leg2MidLng) * 0.5 - 0.001],
-      hospCoord,
+      [pLat, pLng],
+      [pLat + (hLat - pLat) * 0.25 + 0.0012, pLng + (hLng - pLng) * 0.25 - 0.0008],
+      [pLat + (hLat - pLat) * 0.50, pLng + (hLng - pLng) * 0.50 + 0.0015],
+      [pLat + (hLat - pLat) * 0.75 - 0.0008, pLng + (hLng - pLng) * 0.75 + 0.0010],
+      [hLat, hLng],
     ];
+
 
     const leg1DistInfo = getPathDistances(leg1Path);
     const leg2DistInfo = getPathDistances(leg2Path);
