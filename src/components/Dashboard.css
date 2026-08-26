@@ -138,9 +138,12 @@
 
 .dashboard__panel-content {
   flex: 1;
-  overflow-y: auto;
-  padding: var(--sp-3);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
 }
+
 
 /* Center map */
 .dashboard__center {

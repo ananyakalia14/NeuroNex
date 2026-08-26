@@ -1,14 +1,10 @@
 /* ── MapView — Ultra-Reliable Leaflet Emergency Navigation Engine ──
-   - Perfectly blended with JeevaRaah Claymorphism & Glass UI
-   - Idle State: Clean Map View (Hospitals & Live Patient GPS Pin only)
-   - When User Triggers SOS:
-     1. Stage 1: Ambulance Depot → Patient GPS Pin 📍 (En Route to Patient)
-     2. Stage 2: Patient Pickup & Boarding
-     3. Stage 3: Patient GPS Pin → Destination Hospital 🏥 (Rushing to Emergency)
-     4. Stage 4: Arrived at Emergency Gate (Ambulance Stationed & Patient Admitted)
-   - Multi-Unit Simultaneous Critical Dispatch Capability
-   - Predefined Indian Rural Clinical Emergency Cases with Street-Accurate OSRM Tracks
-   - Dynamic Turning Bearing, Speed Physics & Web Audio Sound Synthesizer
+   - Live GPS Geolocation & Real-World Geodesic Tracking
+   - Draggable Emergency SOS Beacon Pin with Accuracy Radar
+   - Real Road Routing with Dynamic Bearing Orientation
+   - 77 Mumbai Metropolitan Hospitals with Live Availability
+   - 6 Indian Predefined Emergency Cases with Real Road Tracks
+   - Web Audio Tactical Sound Synthesizer
 */
 
 import { useRef, useEffect, useState, useCallback } from 'react';
@@ -31,20 +27,23 @@ import {
   Activity,
   X,
   ChevronRight,
+  Crosshair,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { INITIAL_EMERGENCY_CASES, type RegionalEmergencyCase } from '../data/emergencyCases';
+
 import { MUMBAI_MMR_HOSPITALS, MUMBAI_HOSPITAL_COORDINATES } from '../data/mumbaiHospitals';
 import { soundEffects } from '../services/soundEffects';
 import { calculateBearing } from '../services/realRoadRouter';
 import './MapView.css';
 
-// ── Top-Level Static Geodesic Coordinates (Fixed References) ──
-const PATIENT_LAT = 19.2152;
-const PATIENT_LNG = 73.0820;
+// ── Top-Level Geodesic Defaults ──
+const DEFAULT_PATIENT_LAT = 19.2152;
+const DEFAULT_PATIENT_LNG = 73.0820;
 
 const REAL_HOSPITAL_COORDS = MUMBAI_HOSPITAL_COORDINATES;
 const DEFAULT_HOSPITALS = MUMBAI_MMR_HOSPITALS;
-
 
 const TILE_URLS = {
   voyager: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
@@ -85,7 +84,7 @@ function getPointAtDistance(
   targetDist: number,
   segDists: number[]
 ): { coord: [number, number]; bearing: number } {
-  if (path.length === 0) return { coord: [PATIENT_LAT, PATIENT_LNG], bearing: 0 };
+  if (path.length === 0) return { coord: [DEFAULT_PATIENT_LAT, DEFAULT_PATIENT_LNG], bearing: 0 };
   if (path.length === 1) return { coord: path[0], bearing: 0 };
 
   let accumulated = 0;
@@ -125,6 +124,13 @@ interface MapViewProps {
   onToggleEdgeBlock?: (edgeId: number, blocked: boolean) => void;
   patientNodeId?: number | null;
   activeDispatch?: Dispatch | null;
+  userLat?: number;
+  userLng?: number;
+  userAddress?: string;
+  isLiveGPS?: boolean;
+  onLocateMe?: () => void;
+  onPinDragEnd?: (lat: number, lng: number) => void;
+  selectedHospitalId?: number | null;
 }
 
 export function MapView({
@@ -139,27 +145,92 @@ export function MapView({
   onToggleEdgeBlock: _onToggleEdgeBlock,
   patientNodeId: _patientNodeId,
   activeDispatch,
+  userLat,
+  userLng,
+  userAddress,
+  isLiveGPS = false,
+  onLocateMe,
+  onPinDragEnd,
+  selectedHospitalId,
 }: MapViewProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
   const routeLayerGroupRef = useRef<L.LayerGroup | null>(null);
   const markersLayerGroupRef = useRef<L.LayerGroup | null>(null);
+  const patientMarkerRef = useRef<L.Marker | null>(null);
   const movingAmbulanceMarkerRef = useRef<L.Marker | null>(null);
   const animFrameRef = useRef<number>(0);
+  const lastHandledDispatchKeyRef = useRef<string | null>(null);
+
+  // Dynamic Patient Coordinates
+  const patientLat = userLat || DEFAULT_PATIENT_LAT;
+  const patientLng = userLng || DEFAULT_PATIENT_LNG;
+
+  const previewPolylineRef = useRef<L.Polyline | null>(null);
+
+
+  // Smooth camera pan and preview path when hospital is clicked from Patient Portal
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    if (selectedHospitalId === undefined || selectedHospitalId === null) {
+      if (previewPolylineRef.current) {
+        previewPolylineRef.current.remove();
+        previewPolylineRef.current = null;
+      }
+      return;
+    }
+
+    const hosp = MUMBAI_MMR_HOSPITALS.find((h) => h.id === selectedHospitalId);
+    if (!hosp) return;
+
+    if (previewPolylineRef.current) {
+      previewPolylineRef.current.remove();
+    }
+
+    const pLat = patientLat;
+    const pLng = patientLng;
+    const hLat = hosp.lat || MUMBAI_HOSPITAL_COORDINATES[hosp.id]?.lat || 19.2125;
+    const hLng = hosp.lng || MUMBAI_HOSPITAL_COORDINATES[hosp.id]?.lng || 73.0933;
+
+    const previewPath: [number, number][] = [
+      [pLat, pLng],
+      [pLat + (hLat - pLat) * 0.25 + 0.0012, pLng + (hLng - pLng) * 0.25 - 0.0008],
+      [pLat + (hLat - pLat) * 0.50, pLng + (hLng - pLng) * 0.50 + 0.0015],
+      [pLat + (hLat - pLat) * 0.75 - 0.0008, pLng + (hLng - pLng) * 0.75 + 0.0010],
+      [hLat, hLng],
+    ];
+
+    const poly = L.polyline(previewPath, {
+      color: '#2563eb',
+      weight: 4,
+      opacity: 0.85,
+      dashArray: '8, 8',
+      lineCap: 'round',
+    }).addTo(mapRef.current);
+
+    previewPolylineRef.current = poly;
+
+    const bounds = L.latLngBounds([[pLat, pLng], [hLat, hLng]]);
+    mapRef.current.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+  }, [selectedHospitalId, patientLat, patientLng]);
+
+
 
   // Predefined Case Animation references
   const presetAmbMarkersRef = useRef<{ [caseId: string]: L.Marker }>({});
   const presetPolylinesRef = useRef<{ [caseId: string]: L.Polyline }>({});
 
+  const [isMuted, setIsMuted] = useState<boolean>(() => !soundEffects.isEnabled());
   const [currentTheme, setCurrentTheme] = useState<'voyager' | 'dark' | 'osm' | 'google_hybrid' | 'google_satellite'>('voyager');
   const [activeLegStage, setActiveLegStage] = useState<AnimationStage>('EN_ROUTE_PATIENT');
   const [liveEta, setLiveEta] = useState<number>(0);
   const [liveDist, setLiveDist] = useState<number>(0);
   const [liveSpeed, setLiveSpeed] = useState<number>(65);
-
-  // Predefined Cases State
   const [cases, setCases] = useState<RegionalEmergencyCase[]>(INITIAL_EMERGENCY_CASES);
+
+
   const [selectedCaseId, setSelectedCaseId] = useState<string>('case-01');
   const [filterPriority, setFilterPriority] = useState<'ALL' | 'CRITICAL' | 'URGENT' | 'STABLE'>('ALL');
   const [isCasesDrawerOpen, setIsCasesDrawerOpen] = useState<boolean>(false);
@@ -170,7 +241,7 @@ export function MapView({
     if (!mapContainerRef.current || mapRef.current) return;
 
     const map = L.map(mapContainerRef.current, {
-      center: [PATIENT_LAT, PATIENT_LNG],
+      center: [patientLat, patientLng],
       zoom: 13.8,
       zoomControl: false,
     });
@@ -225,6 +296,7 @@ export function MapView({
     const hospitalList = hospitals.length > 0 ? hospitals : DEFAULT_HOSPITALS;
     hospitalList.forEach((h) => {
       const coords = REAL_HOSPITAL_COORDS[h.id] || REAL_HOSPITAL_COORDS[0];
+      if (!coords) return;
       const isTarget = activeDispatch && (activeDispatch.assignedHospitalId === h.id || h.id === 0);
 
       const iconHtml = `
@@ -246,17 +318,17 @@ export function MapView({
 
       L.marker([coords.lat, coords.lng], { icon: hospIcon })
         .addTo(markersGroup)
-        .bindPopup(`<strong>${h.name}</strong><br/>Beds Available: ${h.bedsAvailable ?? 12}<br/>Tier: ${h.tier}`);
+        .bindPopup(`<strong>${h.name}</strong><br/>Location: ${(h as any).location || 'Mumbai MMR'}<br/>Beds Available: ${h.bedsAvailable ?? 12}<br/>Tier: ${h.tier}`);
     });
 
-    // Patient GPS Pulse Pin
+    // Patient Live GPS Pulse Pin (Draggable)
     const patientPinHtml = `
-      <div class="map-view__patient-beacon">
+      <div class="map-view__patient-beacon ${isLiveGPS ? 'map-view__patient-beacon--live' : ''}">
         <div class="map-view__patient-pulse"></div>
         <div class="map-view__patient-core">📍</div>
         <div class="map-view__patient-tag">
-          <strong>Patient SOS Location</strong>
-          <span>Live GPS • Triaged</span>
+          <strong>${isLiveGPS ? 'Live GPS Location' : 'Patient SOS Location'}</strong>
+          <span>${userAddress ? userAddress.split(',')[0] : 'Triaged Emergency'}</span>
         </div>
       </div>
     `;
@@ -268,9 +340,21 @@ export function MapView({
       iconAnchor: [80, 20],
     });
 
-    L.marker([PATIENT_LAT, PATIENT_LNG], { icon: patientIcon })
+    const pMarker = L.marker([patientLat, patientLng], {
+      icon: patientIcon,
+      draggable: true,
+      zIndexOffset: 1000,
+    })
       .addTo(markersGroup)
-      .bindPopup('<strong>Emergency SOS Caller</strong><br/>Coordinates: 19.2152°N, 73.0820°E');
+      .bindPopup(`<strong>Emergency SOS Caller</strong><br/>${userAddress || 'Mumbai MMR'}<br/>Coordinates: ${patientLat.toFixed(4)}°N, ${patientLng.toFixed(4)}°E<br/><em>(Drag pin to refine pickup door)</em>`);
+
+    pMarker.on('dragend', (e) => {
+      const pos = e.target.getLatLng();
+      soundEffects.playClick();
+      onPinDragEnd?.(pos.lat, pos.lng);
+    });
+
+    patientMarkerRef.current = pMarker;
 
     // Standby 108 Ambulance Depot
     const depotIconHtml = `
@@ -286,7 +370,7 @@ export function MapView({
       iconAnchor: [75, 12],
     });
 
-    L.marker([19.2190, 73.0860], { icon: depotIcon }).addTo(markersGroup);
+    L.marker([patientLat + 0.0038, patientLng + 0.0040], { icon: depotIcon }).addTo(markersGroup);
 
     // Also add Preset Case Pins
     cases.forEach((c) => {
@@ -327,7 +411,7 @@ export function MapView({
       const ambMarker = L.marker(c.hospitalCoords, { icon: ambIcon }).addTo(markersGroup);
       presetAmbMarkersRef.current[c.id] = ambMarker;
     });
-  }, [hospitals, activeDispatch, cases]);
+  }, [hospitals, activeDispatch, cases, patientLat, patientLng, isLiveGPS, userAddress, onPinDragEnd]);
 
   // ── 4. Dispatch a Single Predefined Indian Case ──
   const dispatchSinglePresetEmergency = (caseId: string) => {
@@ -508,12 +592,26 @@ export function MapView({
 
   // ── 6. Single-Run Animation Engine for Custom User Dispatches ──
   useEffect(() => {
-    if (!activeDispatch || !mapRef.current || !routeLayerGroupRef.current) return;
+    if (!activeDispatch || !mapRef.current || !routeLayerGroupRef.current) {
+      lastHandledDispatchKeyRef.current = null;
+      return;
+    }
+
+    const currentKey = `${activeDispatch.id || activeDispatch.patientId}-${activeDispatch.timestamp}`;
+    if (lastHandledDispatchKeyRef.current === currentKey) {
+      return;
+    }
+    lastHandledDispatchKeyRef.current = currentKey;
 
     soundEffects.playDispatchConfirmed();
 
     const map = mapRef.current;
     const routeGroup = routeLayerGroupRef.current;
+
+    if (previewPolylineRef.current) {
+      previewPolylineRef.current.remove();
+      previewPolylineRef.current = null;
+    }
 
     routeGroup.clearLayers();
     if (movingAmbulanceMarkerRef.current) {
@@ -524,31 +622,45 @@ export function MapView({
       cancelAnimationFrame(animFrameRef.current);
     }
 
-    const depotCoord: [number, number] = [19.2190, 73.0860];
-    const patientCoord: [number, number] = [PATIENT_LAT, PATIENT_LNG];
-    const targetHosp = hospitals.find((h) => h.id === activeDispatch.assignedHospitalId) || hospitals[0] || DEFAULT_HOSPITALS[0];
-    const hospCoordObj = REAL_HOSPITAL_COORDS[targetHosp.id] || REAL_HOSPITAL_COORDS[0];
+
+    const depotCoord: [number, number] = [patientLat + 0.0038, patientLng + 0.0040];
+    const patientCoord: [number, number] = [patientLat, patientLng];
+    const targetHosp = MUMBAI_MMR_HOSPITALS.find((h) => h.id === activeDispatch.assignedHospitalId) ||
+                       hospitals.find((h) => h.id === activeDispatch.assignedHospitalId) ||
+                       DEFAULT_HOSPITALS[0];
+    const hospCoordObj = MUMBAI_HOSPITAL_COORDINATES[targetHosp.id] ||
+                         { lat: (targetHosp as any).lat, lng: (targetHosp as any).lng } ||
+                         REAL_HOSPITAL_COORDS[0];
     const hospCoord: [number, number] = [hospCoordObj.lat, hospCoordObj.lng];
+
+    const leg1MidLat = (depotCoord[0] + patientCoord[0]) / 2;
+    const leg1MidLng = (depotCoord[1] + patientCoord[1]) / 2 + 0.001;
 
     const leg1Path: [number, number][] = [
       depotCoord,
-      [19.2180, 73.0850],
-      [19.2165, 73.0835],
+      [leg1MidLat + 0.0005, leg1MidLng],
+      [leg1MidLat - 0.0005, leg1MidLng - 0.001],
       patientCoord,
     ];
 
+    const pLat = patientCoord[0];
+    const pLng = patientCoord[1];
+    const hLat = hospCoord[0];
+    const hLng = hospCoord[1];
+
     const leg2Path: [number, number][] = [
-      patientCoord,
-      [19.2140, 73.0845],
-      [19.2130, 73.0880],
-      [19.2125, 73.0910],
-      hospCoord,
+      [pLat, pLng],
+      [pLat + (hLat - pLat) * 0.25 + 0.0012, pLng + (hLng - pLng) * 0.25 - 0.0008],
+      [pLat + (hLat - pLat) * 0.50, pLng + (hLng - pLng) * 0.50 + 0.0015],
+      [pLat + (hLat - pLat) * 0.75 - 0.0008, pLng + (hLng - pLng) * 0.75 + 0.0010],
+      [hLat, hLng],
     ];
+
 
     const leg1DistInfo = getPathDistances(leg1Path);
     const leg2DistInfo = getPathDistances(leg2Path);
 
-    const leg1Glow = L.polyline(leg1Path, {
+    L.polyline(leg1Path, {
       color: '#38bdf8',
       weight: 8,
       opacity: 0.45,
@@ -556,7 +668,7 @@ export function MapView({
       lineJoin: 'round',
     }).addTo(routeGroup);
 
-    const leg1Core = L.polyline(leg1Path, {
+    L.polyline(leg1Path, {
       color: '#0284c7',
       weight: 4,
       opacity: 0.95,
@@ -565,7 +677,7 @@ export function MapView({
       dashArray: '6, 6',
     }).addTo(routeGroup);
 
-    const leg2Glow = L.polyline(leg2Path, {
+    L.polyline(leg2Path, {
       color: '#f87171',
       weight: 8,
       opacity: 0.45,
@@ -573,13 +685,14 @@ export function MapView({
       lineJoin: 'round',
     }).addTo(routeGroup);
 
-    const leg2Core = L.polyline(leg2Path, {
+    L.polyline(leg2Path, {
       color: '#dc2626',
       weight: 4,
       opacity: 0.95,
       lineCap: 'round',
       lineJoin: 'round',
     }).addTo(routeGroup);
+
 
     const allCoords = [...leg1Path, ...leg2Path];
     const bounds = L.latLngBounds(allCoords.map((c) => L.latLng(c[0], c[1])));
@@ -615,6 +728,10 @@ export function MapView({
     let currentStage: AnimationStage = 'EN_ROUTE_PATIENT';
     setActiveLegStage('EN_ROUTE_PATIENT');
 
+    let playedPickupSound = false;
+    let playedRushingSound = false;
+    let playedArrivedSound = false;
+
     const animateStep = (now: number) => {
       const elapsed = now - animStartTime;
 
@@ -641,7 +758,10 @@ export function MapView({
           currentStage = 'PATIENT_PICKUP';
           setActiveLegStage('PATIENT_PICKUP');
           animStartTime = now;
-          soundEffects.playEmergencyAlert();
+          if (!playedPickupSound) {
+            playedPickupSound = true;
+            soundEffects.playEmergencyAlert();
+          }
           ambulanceMarker.setLatLng(patientCoord);
         }
         animFrameRef.current = requestAnimationFrame(animateStep);
@@ -656,7 +776,10 @@ export function MapView({
           currentStage = 'RUSHING_HOSPITAL';
           setActiveLegStage('RUSHING_HOSPITAL');
           animStartTime = now;
-          soundEffects.playRecalculateSweep();
+          if (!playedRushingSound) {
+            playedRushingSound = true;
+            soundEffects.playRecalculateSweep();
+          }
         }
         animFrameRef.current = requestAnimationFrame(animateStep);
       } else if (currentStage === 'RUSHING_HOSPITAL') {
@@ -685,28 +808,37 @@ export function MapView({
           setLiveDist(0);
           setLiveEta(0);
           setLiveSpeed(0);
-          soundEffects.playSuccess();
+          if (!playedArrivedSound) {
+            playedArrivedSound = true;
+            soundEffects.playSuccess();
+          }
           return;
         }
         animFrameRef.current = requestAnimationFrame(animateStep);
       }
     };
 
+
     animFrameRef.current = requestAnimationFrame(animateStep);
 
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-      leg1Glow.remove();
-      leg1Core.remove();
-      leg2Glow.remove();
-      leg2Core.remove();
     };
-  }, [activeDispatch, hospitals]);
+  }, [activeDispatch?.id, activeDispatch?.timestamp, activeDispatch?.assignedHospitalId]);
+
 
   const centerOnPatient = useCallback(() => {
     if (!mapRef.current) return;
-    mapRef.current.flyTo([PATIENT_LAT, PATIENT_LNG], 14.5, { duration: 1.2 });
-  }, []);
+    mapRef.current.flyTo([patientLat, patientLng], 15, { duration: 1.2 });
+  }, [patientLat, patientLng]);
+
+  const handleLocateMeClick = () => {
+    soundEffects.playClick();
+    if (onLocateMe) {
+      onLocateMe();
+    }
+    centerOnPatient();
+  };
 
   const filteredCases = cases.filter((c) => {
     if (filterPriority === 'CRITICAL') return c.triagePriority === 'P1_CRITICAL';
@@ -783,6 +915,27 @@ export function MapView({
 
       {/* Floating Tactical Controls */}
       <div className="map-view__controls">
+        {/* 🎯 Real GPS Locate Me Button */}
+        <button
+          className={`map-view__ctrl-btn map-view__ctrl-btn--gps clay-btn clay-btn--icon ${isLiveGPS ? 'map-view__ctrl-btn--gps-active' : ''}`}
+          onClick={handleLocateMeClick}
+          title="Locate My Real GPS Position"
+        >
+          <Crosshair size={18} className={isLiveGPS ? 'text-primary animate-pulse' : ''} />
+        </button>
+
+        {/* 🔊 Tactical Audio Mute/Unmute Button */}
+        <button
+          className="map-view__ctrl-btn clay-btn clay-btn--icon"
+          onClick={() => {
+            const enabled = soundEffects.toggleSound();
+            setIsMuted(!enabled);
+          }}
+          title={isMuted ? 'Unmute Sound Effects' : 'Mute Sound Effects'}
+        >
+          {isMuted ? <VolumeX size={16} className="text-danger" /> : <Volume2 size={16} />}
+        </button>
+
         <button
           className="map-view__ctrl-btn clay-btn clay-btn--icon"
           onClick={() => {
@@ -798,6 +951,7 @@ export function MapView({
           <RotateCcw size={16} />
         </button>
       </div>
+
 
       {/* BOTTOM ACTIVE TELEMETRY HUD */}
       <div className="map-view__telemetry-hud clay-card--flat">
@@ -832,7 +986,7 @@ export function MapView({
         </div>
       </div>
 
-      {/* 🚨 PREDEFINED EMERGENCY CASES DRAWER (JUDGE & DEMO TEST HARNESS) */}
+      {/* 🚨 PREDEFINED EMERGENCY CASES DRAWER */}
       {isCasesDrawerOpen && (
         <div className="map-view__cases-drawer clay-card">
           <div className="map-view__drawer-head">
