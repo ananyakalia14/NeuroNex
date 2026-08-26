@@ -22,7 +22,6 @@ import {
   ArrowUpRight,
   Crosshair,
 } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { useHospitals } from '../../hooks/useDatabase';
 import type { UrgencyTier, Specialty } from '../../db/schema';
@@ -39,7 +38,9 @@ interface PatientPortalProps {
   onReset?: () => void;
   userLocation?: LiveLocationState | null;
   onLocateMe?: () => void;
+  onSelectHospitalPin?: (hospitalId: number) => void;
 }
+
 
 
 interface TriageOption {
@@ -66,15 +67,18 @@ interface SpecialistOption {
   icon: string;
   facility: string;
   urgency: UrgencyTier;
+  targetHospitalId?: number;
 }
 
 const SPECIALIST_LIST: SpecialistOption[] = [
-  { id: 'cardio', name: 'Cardiologist', specialty: 'cardiology', icon: '🫀', facility: 'AIMS Hospital (24/7 ICU)', urgency: 1 },
-  { id: 'neuro', name: 'Neurologist', specialty: 'neurology', icon: '🧠', facility: 'Fortis Super-Specialty', urgency: 1 },
-  { id: 'ortho', name: 'Orthopedic Surgeon', specialty: 'orthopedics', icon: '🦴', facility: 'RR Multi-Specialty', urgency: 2 },
-  { id: 'obgyn', name: 'Gynecologist', specialty: 'obstetrics', icon: '🤰', facility: 'CSMH Hospital & Maternity', urgency: 2 },
-  { id: 'pediatric', name: 'Pediatrician', specialty: 'pediatrics', icon: '👶', facility: 'Shastri Nagar Civic ER', urgency: 2 },
-  { id: 'emergency', name: 'Trauma Surgeon', specialty: 'emergency', icon: '🚨', facility: 'AIMS Trauma Centre', urgency: 1 },
+  { id: 'cardio', name: 'Interventional Cardiologist', specialty: 'cardiology', icon: '🫀', facility: 'AIMS Super-Specialty (24/7 Cath Lab)', urgency: 1, targetHospitalId: 0 },
+  { id: 'neuro', name: 'Emergency Neurologist', specialty: 'neurology', icon: '🧠', facility: 'RR Multi-Specialty (CT/MRI Ready)', urgency: 1, targetHospitalId: 2 },
+  { id: 'ortho', name: 'Trauma & Orthopedic Surgeon', specialty: 'orthopedics', icon: '🦴', facility: 'Icon Trauma Hospital (OT Ready)', urgency: 2, targetHospitalId: 4 },
+  { id: 'obgyn', name: 'Emergency Obstetrician', specialty: 'obstetrics', icon: '🤰', facility: 'Shastri Nagar Civic Hospital (NICU)', urgency: 1, targetHospitalId: 1 },
+  { id: 'icu', name: 'Critical Care Intensivist', specialty: 'emergency', icon: '🩺', facility: 'Fortis Hospital Mulund (Level-1 ICU)', urgency: 1, targetHospitalId: 25 },
+  { id: 'pediatric', name: 'Pediatric Emergency Specialist', specialty: 'pediatrics', icon: '👶', facility: 'SRCC Children Hospital & KEM', urgency: 2, targetHospitalId: 50 },
+  { id: 'toxico', name: 'Snakebite & Toxicologist', specialty: 'emergency', icon: '🐍', facility: 'District Civil Hospital Thane', urgency: 1, targetHospitalId: 45 },
+  { id: 'burns', name: 'Burns & Trauma Specialist', specialty: 'emergency', icon: '🔥', facility: 'National Burns Center & CSMH', urgency: 1, targetHospitalId: 10 },
 ];
 
 interface MedicineItem {
@@ -84,21 +88,34 @@ interface MedicineItem {
   hospital: string;
   icon: string;
   urgency: UrgencyTier;
+  targetHospitalId?: number;
 }
 
 const CRITICAL_MEDICINES: MedicineItem[] = [
-  { id: 'adrenaline', name: 'Adrenaline IV', stock: '25 Vials Available', hospital: 'AIMS Trauma ER', icon: '💉', urgency: 1 },
-  { id: 'asv', name: 'Anti-Snake Venom (ASV)', stock: '15 Vials In-Stock', hospital: 'District Civil ER', icon: '🐍', urgency: 1 },
-  { id: 'blood', name: 'Blood Bank (All Groups)', stock: '32 Units Ready', hospital: 'RR Blood Centre', icon: '🩸', urgency: 1 },
-  { id: 'oxytocin', name: 'Oxytocin Ampoules', stock: '40 Ampoules Ready', hospital: 'Maternity Centre', icon: '🤰', urgency: 2 },
-  { id: 'morphine', name: 'Morphine IV Analgesic', stock: '20 Vials Ready', hospital: 'Super-Specialty ICU', icon: '💊', urgency: 2 },
-  { id: 'atropine', name: 'Atropine Antidote', stock: '30 Vials Available', hospital: 'Civic Hospital', icon: '🧪', urgency: 1 },
+  { id: 'asv', name: 'Polyvalent Snake Antivenom', stock: '24 Vials Ready', hospital: 'AIMS Hospital & ICU', icon: '🐍', urgency: 1, targetHospitalId: 0 },
+  { id: 'streptokinase', name: 'Streptokinase (Thrombolytic)', stock: '12 Vials Ready', hospital: 'RR Multi-Specialty', icon: '💉', urgency: 1, targetHospitalId: 2 },
+  { id: 'atropine', name: 'Atropine Antidote (OP Poison)', stock: '30 Vials Available', hospital: 'Shastri Nagar Civic', icon: '🧪', urgency: 1, targetHospitalId: 1 },
+  { id: 'mannitol', name: 'IV Mannitol 20% (Neuro Decompress)', stock: '18 Bottles Ready', hospital: 'KEM Hospital & ER', icon: '💧', urgency: 1, targetHospitalId: 50 },
+  { id: 'blood', name: 'O-Negative Emergency Packed RBCs', stock: '6 Units Reserved', hospital: 'Lilavati Blood Bank', icon: '🩸', urgency: 1, targetHospitalId: 24 },
+  { id: 'salbutamol', name: 'Inhaled Salbutamol & Ipratropium', stock: '40 Nebules Ready', hospital: 'Cooper Civic ER', icon: '💨', urgency: 2, targetHospitalId: 52 },
+  { id: 'tranexamic', name: 'Tranexamic Acid (Hemostatic)', stock: '35 Ampoules Ready', hospital: 'Fortis Mulund', icon: '🩹', urgency: 1, targetHospitalId: 25 },
+  { id: 'rabies', name: 'Anti-Rabies & Tetanus Serum', stock: '50 Doses Available', hospital: 'Rajawadi Hospital', icon: '🛡️', urgency: 2, targetHospitalId: 55 },
 ];
 
-import { MUMBAI_MMR_HOSPITALS } from '../../data/mumbaiHospitals';
+import { MUMBAI_MMR_HOSPITALS, MUMBAI_HOSPITAL_COORDINATES } from '../../data/mumbaiHospitals';
 
 const DEFAULT_LOCAL_HOSPITALS = MUMBAI_MMR_HOSPITALS;
 
+function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Earth radius in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return parseFloat((R * c).toFixed(1));
+}
 
 export function PatientPortal({
   onTriggerSOS,
@@ -108,14 +125,19 @@ export function PatientPortal({
   onReset,
   userLocation,
   onLocateMe,
+  onSelectHospitalPin,
 }: PatientPortalProps) {
-  const { profile } = useAuth();
   const { t, language } = useLanguage();
+
   const { hospitals } = useHospitals();
   const [voiceActive, setVoiceActive] = useState(true);
   const [showFirstAid, setShowFirstAid] = useState(false);
   const [activeTab, setActiveTab] = useState<'hospital' | 'specialist' | 'medicine'>('hospital');
   const [searchQuery, setSearchQuery] = useState('');
+  const [highlightedHospId, setHighlightedHospId] = useState<number | null>(null);
+
+  const curLat = userLocation?.lat || 19.2152;
+  const curLng = userLocation?.lng || 73.0820;
 
   // Voice confirmation
   const speakConfirmation = (text: string) => {
@@ -145,26 +167,37 @@ export function PatientPortal({
   };
 
   const handleSpecialistRoute = (spec: SpecialistOption) => {
-    speakConfirmation(`Routing to nearest hospital with ${spec.name}.`);
-    onTriggerSOS(spec.urgency, spec.specialty);
+    speakConfirmation(`Routing to ${spec.facility.split('(')[0].trim()} for ${spec.name}.`);
+    onTriggerSOS(spec.urgency, spec.specialty, undefined, spec.targetHospitalId);
   };
 
   const handleMedicineRoute = (med: MedicineItem) => {
-    speakConfirmation(`Routing to facility with ${med.name}.`);
-    onTriggerSOS(med.urgency, undefined, med.name);
+    speakConfirmation(`Routing to ${med.hospital.split('(')[0].trim()} for ${med.name}.`);
+    onTriggerSOS(med.urgency, undefined, med.name, med.targetHospitalId);
   };
 
   const isDispatched = !!activeDispatchId || !!lastResult;
 
   const activeHospitalList = hospitals.length > 0 ? hospitals : DEFAULT_LOCAL_HOSPITALS;
-  const filteredHospitals = activeHospitalList.filter((h) => {
-    const q = searchQuery.toLowerCase();
-    const nameMatch = h.name.toLowerCase().includes(q);
-    const tierMatch = h.tier.toLowerCase().includes(q);
-    const locationMatch = (h as any).location?.toLowerCase()?.includes(q);
-    const areaMatch = (h as any).administrativeArea?.toLowerCase()?.includes(q);
-    return nameMatch || tierMatch || locationMatch || areaMatch;
-  });
+  const filteredHospitals = activeHospitalList
+    .map((h) => {
+      const coord = (h as any).lat !== undefined
+        ? { lat: (h as any).lat, lng: (h as any).lng }
+        : MUMBAI_HOSPITAL_COORDINATES[h.id] || { lat: 19.2125, lng: 73.0933 };
+      const dist = calculateDistanceKm(curLat, curLng, coord.lat, coord.lng);
+      const eta = Math.max(3, Math.round(dist * 2.1));
+      return { ...h, distKm: dist, etaMin: eta };
+    })
+
+    .filter((h) => {
+      const q = searchQuery.toLowerCase();
+      const nameMatch = h.name.toLowerCase().includes(q);
+      const tierMatch = h.tier.toLowerCase().includes(q);
+      const locationMatch = (h as any).location?.toLowerCase()?.includes(q);
+      const areaMatch = (h as any).administrativeArea?.toLowerCase()?.includes(q);
+      return nameMatch || tierMatch || locationMatch || areaMatch;
+    })
+    .sort((a, b) => a.distKm - b.distKm);
 
   const filteredSpecialists = SPECIALIST_LIST.filter((s) =>
     s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -188,27 +221,27 @@ export function PatientPortal({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
           >
-            {/* ── 1. Minimal Header ── */}
+            {/* ── 1. Compact Header ── */}
             <header className="patient-portal__header">
               <div className="patient-portal__header-left">
                 <div className="patient-portal__header-status">
                   <span className="patient-portal__status-dot" />
-                  <h1 className="patient-portal__heading">Emergency SOS</h1>
+                  <h2 className="patient-portal__heading">Emergency SOS</h2>
                 </div>
                 <div className="patient-portal__sub-location">
-                  <MapPin size={12} className={userLocation?.isLiveGPS ? 'text-emerald-600' : 'text-slate-400'} />
-                  <span className="truncate max-w-[190px]">
-                    {userLocation?.address || profile.villageName || 'Live GPS Sector (India)'}
-                  </span>
+                  <MapPin size={11} className="text-slate-400" />
+                  <span>{userLocation?.address || 'Mumbai MMR • Live GPS Ready'}</span>
+                  {userLocation?.accuracy && (
+                    <span className="text-slate-400 ml-1">±{Math.round(userLocation.accuracy)}m</span>
+                  )}
                   {onLocateMe && (
                     <button
                       type="button"
                       onClick={onLocateMe}
-                      className="ml-1.5 px-2 py-0.5 text-3xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-full flex items-center gap-1 transition-all border border-emerald-200"
-                      title="Sync Live GPS Position"
+                      className="text-primary hover:underline ml-1 cursor-pointer"
+                      title="Update GPS position"
                     >
-                      <Crosshair size={10} className={userLocation?.isLocating ? 'animate-spin' : ''} />
-                      <span>{userLocation?.isLiveGPS ? (userLocation.accuracy ? `±${userLocation.accuracy}m GPS` : 'GPS Live') : 'Sync GPS'}</span>
+                      <Crosshair size={11} className="inline ml-0.5" />
                     </button>
                   )}
                 </div>
@@ -227,7 +260,6 @@ export function PatientPortal({
               >
                 {voiceActive ? <Volume2 size={15} /> : <VolumeX size={15} />}
               </button>
-
             </header>
 
             {/* ── 2. Master Emergency SOS Action ── */}
@@ -279,7 +311,7 @@ export function PatientPortal({
                     setSearchQuery('');
                   }}
                 >
-                  <Building2 size={13} />
+                  <Building2 size={12} />
                   <span>Hospitals ({filteredHospitals.length})</span>
                 </button>
                 <button
@@ -290,9 +322,8 @@ export function PatientPortal({
                     setSearchQuery('');
                   }}
                 >
-                  <Stethoscope size={13} />
-                  <span>Specialists</span>
-
+                  <Stethoscope size={12} />
+                  <span>Specialists ({filteredSpecialists.length})</span>
                 </button>
                 <button
                   type="button"
@@ -302,8 +333,8 @@ export function PatientPortal({
                     setSearchQuery('');
                   }}
                 >
-                  <Pill size={13} />
-                  <span>Medicines</span>
+                  <Pill size={12} />
+                  <span>Medicines ({filteredMedicines.length})</span>
                 </button>
               </div>
 
@@ -329,29 +360,43 @@ export function PatientPortal({
               {activeTab === 'hospital' && (
                 <div className="patient-portal__list">
                   {filteredHospitals.map((h) => (
-                    <div key={h.id} className="patient-portal__row">
+                    <div
+                      key={h.id}
+                      className={`patient-portal__row ${highlightedHospId === h.id ? 'patient-portal__row--active' : ''}`}
+                      onClick={() => {
+                        setHighlightedHospId(h.id);
+                        onSelectHospitalPin?.(h.id);
+                      }}
+                      style={{ cursor: 'pointer' }}
+                      title={`Click to focus map on ${h.name}`}
+                    >
                       <div className="patient-portal__row-left">
                         <div className="patient-portal__row-header">
                           <span className="patient-portal__row-title">{h.name}</span>
                           <span className="patient-portal__tag">{h.tier}</span>
+                          <span className="text-3xs font-bold text-slate-500 bg-slate-100 px-1 py-0.2 rounded">
+                            {h.distKm} km • ~{h.etaMin}m
+                          </span>
                         </div>
                         <div className="patient-portal__row-meta">
                           <span className="patient-portal__bed-text">
                             <Bed size={11} /> {h.bedsAvailable} Beds Ready
                           </span>
                           <span className="patient-portal__bullet">•</span>
-                          <span className="patient-portal__spec-text">{h.specialties.slice(0, 2).join(', ')}</span>
+                          <span className="patient-portal__spec-text">{(h as any).location || h.specialties.slice(0, 2).join(', ')}</span>
                         </div>
                       </div>
 
                       <button
                         type="button"
                         className="patient-portal__btn-action"
-                        onClick={() => handleHospitalRoute(h)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleHospitalRoute(h);
+                        }}
                       >
                         Route
                       </button>
-
                     </div>
                   ))}
                 </div>

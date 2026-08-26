@@ -130,6 +130,7 @@ interface MapViewProps {
   isLiveGPS?: boolean;
   onLocateMe?: () => void;
   onPinDragEnd?: (lat: number, lng: number) => void;
+  selectedHospitalId?: number | null;
 }
 
 export function MapView({
@@ -150,6 +151,7 @@ export function MapView({
   isLiveGPS = false,
   onLocateMe,
   onPinDragEnd,
+  selectedHospitalId,
 }: MapViewProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -160,6 +162,16 @@ export function MapView({
   const movingAmbulanceMarkerRef = useRef<L.Marker | null>(null);
   const animFrameRef = useRef<number>(0);
   const lastHandledDispatchKeyRef = useRef<string | null>(null);
+
+  // Smooth camera pan when hospital is clicked from Patient Portal
+  useEffect(() => {
+    if (selectedHospitalId === undefined || selectedHospitalId === null || !mapRef.current) return;
+    const hosp = MUMBAI_MMR_HOSPITALS.find((h) => h.id === selectedHospitalId);
+    if (hosp) {
+      mapRef.current.flyTo([hosp.lat, hosp.lng], 15, { animate: true, duration: 1.0 });
+    }
+  }, [selectedHospitalId]);
+
 
   // Predefined Case Animation references
   const presetAmbMarkersRef = useRef<{ [caseId: string]: L.Marker }>({});

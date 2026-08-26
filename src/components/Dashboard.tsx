@@ -58,6 +58,8 @@ export function Dashboard() {
   });
 
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedHospitalId, setSelectedHospitalId] = useState<number | null>(null);
+
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -329,8 +331,10 @@ export function Dashboard() {
                       onReset={handleResetDispatch}
                       userLocation={userLocation}
                       onLocateMe={requestGPSLocation}
+                      onSelectHospitalPin={(id) => setSelectedHospitalId(id)}
                     />
                   )}
+
 
 
                   {/* 🚑 108 AMBULANCE DRIVER / PILOT PORTAL */}
@@ -421,7 +425,9 @@ export function Dashboard() {
                 isLiveGPS={userLocation.isLiveGPS}
                 onLocateMe={requestGPSLocation}
                 onPinDragEnd={setManualLocation}
+                selectedHospitalId={selectedHospitalId}
               />
+
             </main>
 
             {/* Right Panel: Telemetry & Decision Log (Only for Admin Commander & Hospital Staff) */}
@@ -467,6 +473,7 @@ export function Dashboard() {
               isLiveGPS={userLocation.isLiveGPS}
               onLocateMe={requestGPSLocation}
               onPinDragEnd={setManualLocation}
+              selectedHospitalId={selectedHospitalId}
             />
           )}
 
@@ -474,15 +481,23 @@ export function Dashboard() {
             <div className="dashboard__mobile-panel">
               {role === 'patient' && (
                 <PatientPortal
-                  onTriggerSOS={(urgency, spec, med, targetHId) => handleDispatch(urgency, spec, med, targetHId)}
+                  onTriggerSOS={(urgency, spec, med, targetHId) => {
+                    handleDispatch(urgency, spec, med, targetHId);
+                    setMobileTab('map');
+                  }}
                   isComputing={pathfinder.isComputing}
                   lastResult={pathfinder.lastResult}
                   activeDispatchId={activeDispatch?.id}
                   onReset={handleResetDispatch}
                   userLocation={userLocation}
                   onLocateMe={requestGPSLocation}
+                  onSelectHospitalPin={(id) => {
+                    setSelectedHospitalId(id);
+                    setMobileTab('map');
+                  }}
                 />
               )}
+
 
 
               {role === 'driver' && (
