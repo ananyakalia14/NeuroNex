@@ -162,19 +162,30 @@ export function PatientPortal({
   };
 
   const handleHospitalRoute = (h: any) => {
+    setHighlightedHospId(h.id);
+    onSelectHospitalPin?.(h.id);
     speakConfirmation(`Routing to ${h.name.split('(')[0].trim()}.`);
     onTriggerSOS(1, h.specialties?.[0], undefined, h.id);
   };
 
-  const handleSpecialistRoute = (spec: SpecialistOption) => {
+  const handleSpecialistRoute = (spec: any) => {
+    if (spec.targetHospitalId !== undefined) {
+      setHighlightedHospId(spec.targetHospitalId);
+      onSelectHospitalPin?.(spec.targetHospitalId);
+    }
     speakConfirmation(`Routing to ${spec.facility.split('(')[0].trim()} for ${spec.name}.`);
     onTriggerSOS(spec.urgency, spec.specialty, undefined, spec.targetHospitalId);
   };
 
-  const handleMedicineRoute = (med: MedicineItem) => {
+  const handleMedicineRoute = (med: any) => {
+    if (med.targetHospitalId !== undefined) {
+      setHighlightedHospId(med.targetHospitalId);
+      onSelectHospitalPin?.(med.targetHospitalId);
+    }
     speakConfirmation(`Routing to ${med.hospital.split('(')[0].trim()} for ${med.name}.`);
     onTriggerSOS(med.urgency, undefined, med.name, med.targetHospitalId);
   };
+
 
   const isDispatched = !!activeDispatchId || !!lastResult;
 
@@ -199,15 +210,34 @@ export function PatientPortal({
     })
     .sort((a, b) => a.distKm - b.distKm);
 
-  const filteredSpecialists = SPECIALIST_LIST.filter((s) =>
-    s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.facility.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredSpecialists = SPECIALIST_LIST
+    .map((s) => {
+      const targetId = s.targetHospitalId ?? 0;
+      const coord = MUMBAI_HOSPITAL_COORDINATES[targetId] || { lat: 19.2125, lng: 73.0933 };
+      const dist = calculateDistanceKm(curLat, curLng, coord.lat, coord.lng);
+      const eta = Math.max(3, Math.round(dist * 2.1));
+      return { ...s, distKm: dist, etaMin: eta };
+    })
+    .filter((s) =>
+      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.facility.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => a.distKm - b.distKm);
 
-  const filteredMedicines = CRITICAL_MEDICINES.filter((m) =>
-    m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    m.hospital.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredMedicines = CRITICAL_MEDICINES
+    .map((m) => {
+      const targetId = m.targetHospitalId ?? 0;
+      const coord = MUMBAI_HOSPITAL_COORDINATES[targetId] || { lat: 19.2125, lng: 73.0933 };
+      const dist = calculateDistanceKm(curLat, curLng, coord.lat, coord.lng);
+      const eta = Math.max(3, Math.round(dist * 2.1));
+      return { ...m, distKm: dist, etaMin: eta };
+    })
+    .filter((m) =>
+      m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      m.hospital.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => a.distKm - b.distKm);
+
 
   return (
     <div className="patient-portal">
@@ -406,11 +436,25 @@ export function PatientPortal({
               {activeTab === 'specialist' && (
                 <div className="patient-portal__list">
                   {filteredSpecialists.map((s) => (
-                    <div key={s.id} className="patient-portal__row">
+                    <div
+                      key={s.id}
+                      className={`patient-portal__row ${highlightedHospId === s.targetHospitalId ? 'patient-portal__row--active' : ''}`}
+                      onClick={() => {
+                        if (s.targetHospitalId !== undefined) {
+                          setHighlightedHospId(s.targetHospitalId);
+                          onSelectHospitalPin?.(s.targetHospitalId);
+                        }
+                      }}
+                      style={{ cursor: 'pointer' }}
+                      title={`Click to preview route to ${s.facility}`}
+                    >
                       <div className="patient-portal__row-left">
                         <div className="patient-portal__row-header">
                           <span className="text-xs mr-1">{s.icon}</span>
                           <span className="patient-portal__row-title">{s.name}</span>
+                          <span className="patient-portal__dist-badge">
+                            ⚡ {s.distKm} km • ~{s.etaMin}m
+                          </span>
                         </div>
                         <span className="patient-portal__facility-text">{s.facility}</span>
                       </div>
@@ -418,7 +462,10 @@ export function PatientPortal({
                       <button
                         type="button"
                         className="patient-portal__btn-action patient-portal__btn-action--danger"
-                        onClick={() => handleSpecialistRoute(s)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSpecialistRoute(s);
+                        }}
                       >
                         Select
                       </button>
@@ -431,11 +478,25 @@ export function PatientPortal({
               {activeTab === 'medicine' && (
                 <div className="patient-portal__list">
                   {filteredMedicines.map((m) => (
-                    <div key={m.id} className="patient-portal__row">
+                    <div
+                      key={m.id}
+                      className={`patient-portal__row ${highlightedHospId === m.targetHospitalId ? 'patient-portal__row--active' : ''}`}
+                      onClick={() => {
+                        if (m.targetHospitalId !== undefined) {
+                          setHighlightedHospId(m.targetHospitalId);
+                          onSelectHospitalPin?.(m.targetHospitalId);
+                        }
+                      }}
+                      style={{ cursor: 'pointer' }}
+                      title={`Click to preview route to ${m.hospital}`}
+                    >
                       <div className="patient-portal__row-left">
                         <div className="patient-portal__row-header">
                           <span className="text-xs mr-1">{m.icon}</span>
                           <span className="patient-portal__row-title">{m.name}</span>
+                          <span className="patient-portal__dist-badge">
+                            ⚡ {m.distKm} km • ~{m.etaMin}m
+                          </span>
                         </div>
                         <div className="patient-portal__row-meta">
                           <span className="patient-portal__stock-text">{m.stock}</span>
@@ -447,7 +508,10 @@ export function PatientPortal({
                       <button
                         type="button"
                         className="patient-portal__btn-action patient-portal__btn-action--green"
-                        onClick={() => handleMedicineRoute(m)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMedicineRoute(m);
+                        }}
                       >
                         Route
                       </button>
@@ -455,6 +519,7 @@ export function PatientPortal({
                   ))}
                 </div>
               )}
+
             </div>
 
             {/* ── 5. Minimal First-Aid Toggle ── */}
