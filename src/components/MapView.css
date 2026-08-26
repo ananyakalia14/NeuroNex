@@ -527,10 +527,32 @@
   100% { width: 40px; height: 40px; opacity: 0; }
 }
 
+.map-view__patient-beacon--live {
+  border-color: #2E7D32;
+  box-shadow: 0 4px 16px rgba(46, 125, 50, 0.3);
+}
+
+.map-view__patient-beacon--live .map-view__patient-pulse {
+  background: rgba(46, 125, 50, 0.35);
+  border: 1.5px solid #2E7D32;
+}
+
+.map-view__patient-beacon--live .map-view__patient-tag strong {
+  color: #2E7D32;
+}
+
+.map-view__ctrl-btn--gps-active {
+  background: #E8F5E9 !important;
+  border-color: #2E7D32 !important;
+  color: #2E7D32 !important;
+  box-shadow: 0 0 12px rgba(46, 125, 50, 0.4) !important;
+}
+
 .map-view__patient-core {
   font-size: 1rem;
   z-index: 2;
 }
+
 
 .map-view__patient-tag {
   display: flex;

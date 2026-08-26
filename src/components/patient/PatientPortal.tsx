@@ -20,12 +20,14 @@ import {
   Search,
   Bed,
   ArrowUpRight,
+  Crosshair,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { useHospitals } from '../../hooks/useDatabase';
 import type { UrgencyTier, Specialty } from '../../db/schema';
 import type { RouteResult } from '../../workers/types';
+import type { LiveLocationState } from '../../hooks/useLiveLocation';
 import { formatTime, formatDistance } from '../../utils/geo';
 import './PatientPortal.css';
 
@@ -35,7 +37,10 @@ interface PatientPortalProps {
   lastResult: RouteResult | null;
   activeDispatchId?: number;
   onReset?: () => void;
+  userLocation?: LiveLocationState | null;
+  onLocateMe?: () => void;
 }
+
 
 interface TriageOption {
   id: string;
@@ -101,6 +106,8 @@ export function PatientPortal({
   lastResult,
   activeDispatchId,
   onReset,
+  userLocation,
+  onLocateMe,
 }: PatientPortalProps) {
   const { profile } = useAuth();
   const { t, language } = useLanguage();
@@ -182,8 +189,21 @@ export function PatientPortal({
                   <h1 className="patient-portal__heading">Emergency SOS</h1>
                 </div>
                 <div className="patient-portal__sub-location">
-                  <MapPin size={12} className="text-slate-400" />
-                  <span>{profile.villageName || 'Live GPS Sector (India)'}</span>
+                  <MapPin size={12} className={userLocation?.isLiveGPS ? 'text-emerald-600' : 'text-slate-400'} />
+                  <span className="truncate max-w-[190px]">
+                    {userLocation?.address || profile.villageName || 'Live GPS Sector (India)'}
+                  </span>
+                  {onLocateMe && (
+                    <button
+                      type="button"
+                      onClick={onLocateMe}
+                      className="ml-1.5 px-2 py-0.5 text-3xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-full flex items-center gap-1 transition-all border border-emerald-200"
+                      title="Sync Live GPS Position"
+                    >
+                      <Crosshair size={10} className={userLocation?.isLocating ? 'animate-spin' : ''} />
+                      <span>{userLocation?.isLiveGPS ? (userLocation.accuracy ? `±${userLocation.accuracy}m GPS` : 'GPS Live') : 'Sync GPS'}</span>
+                    </button>
+                  )}
                 </div>
               </div>
 

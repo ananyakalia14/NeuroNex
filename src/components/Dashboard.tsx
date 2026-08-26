@@ -15,6 +15,7 @@ import { usePathfinder } from '../hooks/usePathfinder';
 import { useHospitals, useDispatches, useAmbulances, useNodes, useEdges } from '../hooks/useDatabase';
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
 import { useAuth } from '../hooks/useAuth';
+import { useLiveLocation } from '../hooks/useLiveLocation';
 import { db } from '../db/schema';
 import type { UrgencyTier, Specialty, GraphNode, GraphEdge, Dispatch } from '../db/schema';
 import type { RouteResult } from '../workers/types';
@@ -26,7 +27,14 @@ type MobileTab = 'map' | 'portal' | 'simulation' | 'telemetry';
 
 export function Dashboard() {
   // Auth Context
-  const { role, profile } = useAuth();
+  const { role, profile, updateProfile } = useAuth();
+
+  // 📍 Live GPS Geolocation Hook
+  const { location: userLocation, requestGPSLocation, setManualLocation } = useLiveLocation(
+    useCallback((lat: number, lng: number, address: string) => {
+      updateProfile({ lat, lng, villageName: address });
+    }, [updateProfile])
+  );
 
   // State
   const [mobileTab, setMobileTab] = useState<MobileTab>('portal');
@@ -36,6 +44,7 @@ export function Dashboard() {
   const [routeNodeIds, setRouteNodeIds] = useState<number[]>([]);
   const [activeDispatch, setActiveDispatch] = useState<Dispatch | null>(null);
   const [edges, setEdges] = useState<GraphEdge[]>([]);
+
 
 
   // Draggable Map / Sidebar Resizer State
@@ -308,6 +317,8 @@ export function Dashboard() {
                       lastResult={pathfinder.lastResult}
                       activeDispatchId={activeDispatch?.id}
                       onReset={handleResetDispatch}
+                      userLocation={userLocation}
+                      onLocateMe={requestGPSLocation}
                     />
                   )}
 
@@ -393,6 +404,12 @@ export function Dashboard() {
                 onToggleEdgeBlock={handleToggleEdgeBlock}
                 patientNodeId={role === 'patient' ? (profile.villageNodeId || 20) : null}
                 activeDispatch={activeDispatch}
+                userLat={userLocation.lat}
+                userLng={userLocation.lng}
+                userAddress={userLocation.address}
+                isLiveGPS={userLocation.isLiveGPS}
+                onLocateMe={requestGPSLocation}
+                onPinDragEnd={setManualLocation}
               />
             </main>
 
@@ -433,6 +450,12 @@ export function Dashboard() {
               onToggleEdgeBlock={handleToggleEdgeBlock}
               patientNodeId={role === 'patient' ? (profile.villageNodeId || 20) : null}
               activeDispatch={activeDispatch}
+              userLat={userLocation.lat}
+              userLng={userLocation.lng}
+              userAddress={userLocation.address}
+              isLiveGPS={userLocation.isLiveGPS}
+              onLocateMe={requestGPSLocation}
+              onPinDragEnd={setManualLocation}
             />
           )}
 
@@ -445,8 +468,11 @@ export function Dashboard() {
                   lastResult={pathfinder.lastResult}
                   activeDispatchId={activeDispatch?.id}
                   onReset={handleResetDispatch}
+                  userLocation={userLocation}
+                  onLocateMe={requestGPSLocation}
                 />
               )}
+
               {role === 'driver' && (
                 <DriverPortal
                   activeDispatch={dispatches.find((d) => d.status === 'DISPATCHED' || d.status === 'EN_ROUTE') || dispatches[0] || null}
