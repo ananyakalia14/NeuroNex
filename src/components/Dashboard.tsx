@@ -51,11 +51,12 @@ export function Dashboard() {
   const [sidebarWidth, setSidebarWidth] = useState<number>(() => {
     try {
       const saved = localStorage.getItem('jeevraah_sidebar_width');
-      return saved ? parseInt(saved, 10) : 380;
+      return saved ? parseInt(saved, 10) : 440;
     } catch {
-      return 380;
+      return 440;
     }
   });
+
   const [isDragging, setIsDragging] = useState(false);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -154,26 +155,34 @@ export function Dashboard() {
 
   // Handle dispatch execution with Dynamic Ambulance Co-Optimization & Guaranteed Fallback
   const handleDispatch = useCallback(
-    async (urgencyTier: UrgencyTier, specialty?: Specialty, medicine?: string) => {
+    async (urgencyTier: UrgencyTier, specialty?: Specialty, medicine?: string, targetHospitalId?: number) => {
       const sourceId = selectedNodeId || profile.villageNodeId || 20;
       const sourceObj = selectedNode || (await db.nodes.get(sourceId));
 
       let result: RouteResult;
       try {
         result = await pathfinder.findRoute(sourceId, urgencyTier, specialty, medicine);
+        if (targetHospitalId !== undefined) {
+          const targetH = hospitals.find((h) => h.id === targetHospitalId);
+          if (targetH) {
+            result.hospitalId = targetH.id;
+            result.hospitalName = targetH.name;
+          }
+        }
       } catch (err) {
         console.warn('Worker pathfinder hydrating, using direct rapid A* result:', err);
+        const targetH = targetHospitalId !== undefined ? hospitals.find((h) => h.id === targetHospitalId) : null;
         result = {
           type: 'ROUTE_RESULT',
           requestId: generateId(),
           success: true,
-          hospitalId: 0,
-          hospitalName: 'AIMS Hospital & ICU (MIDC Dombivli)',
-          routeNodeIds: [sourceId, 20, 21, 22, 0],
+          hospitalId: targetH ? targetH.id : 0,
+          hospitalName: targetH ? targetH.name : 'AIMS Hospital & ICU (MIDC Dombivli)',
+          routeNodeIds: [sourceId, 20, 21, 22, targetH ? targetH.nodeId : 0],
           totalDistance: 2.4,
           totalTime: 4.2,
           score: 12.4,
-          rationale: 'Selected AIMS Hospital & ICU: Travel: 4.2 min | Beds: 14/180 (good) | Has cardiology',
+          rationale: `Direct route locked to ${targetH ? targetH.name : 'AIMS Hospital & ICU'}`,
           alternativesConsidered: [
             { hospitalId: 1, hospitalName: 'Shastri Nagar Civic Hospital', score: 16.2, reason: 'Travel: 6.1m | Beds: 8/90' },
             { hospitalId: 2, hospitalName: 'RR Multi-Specialty Hospital', score: 18.5, reason: 'Travel: 5.4m | Beds: 12/110' },
@@ -192,6 +201,7 @@ export function Dashboard() {
           totalTripTime: 4.2,
         };
       }
+
 
       try {
         // Dynamic algorithm-selected ambulance and driver info
@@ -312,7 +322,7 @@ export function Dashboard() {
                   {/* 🧑‍🌾 PATIENT PORTAL */}
                   {role === 'patient' && (
                     <PatientPortal
-                      onTriggerSOS={(urgency, spec) => handleDispatch(urgency, spec)}
+                      onTriggerSOS={(urgency, spec, med, targetHId) => handleDispatch(urgency, spec, med, targetHId)}
                       isComputing={pathfinder.isComputing}
                       lastResult={pathfinder.lastResult}
                       activeDispatchId={activeDispatch?.id}
@@ -321,6 +331,7 @@ export function Dashboard() {
                       onLocateMe={requestGPSLocation}
                     />
                   )}
+
 
                   {/* 🚑 108 AMBULANCE DRIVER / PILOT PORTAL */}
                   {role === 'driver' && (
@@ -463,7 +474,7 @@ export function Dashboard() {
             <div className="dashboard__mobile-panel">
               {role === 'patient' && (
                 <PatientPortal
-                  onTriggerSOS={(urgency, spec) => handleDispatch(urgency, spec)}
+                  onTriggerSOS={(urgency, spec, med, targetHId) => handleDispatch(urgency, spec, med, targetHId)}
                   isComputing={pathfinder.isComputing}
                   lastResult={pathfinder.lastResult}
                   activeDispatchId={activeDispatch?.id}
@@ -472,6 +483,7 @@ export function Dashboard() {
                   onLocateMe={requestGPSLocation}
                 />
               )}
+
 
               {role === 'driver' && (
                 <DriverPortal

@@ -32,7 +32,7 @@ import { formatTime, formatDistance } from '../../utils/geo';
 import './PatientPortal.css';
 
 interface PatientPortalProps {
-  onTriggerSOS: (urgency: UrgencyTier, specialty?: Specialty, medicine?: string) => void;
+  onTriggerSOS: (urgency: UrgencyTier, specialty?: Specialty, medicine?: string, targetHospitalId?: number) => void;
   isComputing: boolean;
   lastResult: RouteResult | null;
   activeDispatchId?: number;
@@ -120,10 +120,12 @@ export function PatientPortal({
   // Voice confirmation
   const speakConfirmation = (text: string) => {
     if (!voiceActive || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1.05;
-    window.speechSynthesis.speak(utterance);
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.05;
+      window.speechSynthesis.speak(utterance);
+    } catch {}
   };
 
   const handleQuickSOS = (option: TriageOption) => {
@@ -135,6 +137,11 @@ export function PatientPortal({
         : `Emergency alert dispatched. Nearest ambulance is en route.`;
     speakConfirmation(prompt);
     onTriggerSOS(option.urgency, option.specialty);
+  };
+
+  const handleHospitalRoute = (h: any) => {
+    speakConfirmation(`Routing to ${h.name.split('(')[0].trim()}.`);
+    onTriggerSOS(1, h.specialties?.[0], undefined, h.id);
   };
 
   const handleSpecialistRoute = (spec: SpecialistOption) => {
@@ -340,10 +347,11 @@ export function PatientPortal({
                       <button
                         type="button"
                         className="patient-portal__btn-action"
-                        onClick={() => onTriggerSOS(1)}
+                        onClick={() => handleHospitalRoute(h)}
                       >
                         Route
                       </button>
+
                     </div>
                   ))}
                 </div>

@@ -173,12 +173,12 @@
 .patient-portal__triage-block {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .patient-portal__section-label {
-  font-size: 10.5px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -191,12 +191,13 @@
   gap: 6px;
 }
 
+.patient-portal__triage-card,
 .patient-portal__triage-item {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 10px;
-  border-radius: 8px;
+  border-radius: 9px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   cursor: pointer;
@@ -204,19 +205,22 @@
   transition: all 0.15s ease;
 }
 
+.patient-portal__triage-card:hover,
 .patient-portal__triage-item:hover {
   background: #ffffff;
   border-color: #cbd5e1;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
 }
 
+.patient-portal__triage-icon,
 .patient-portal__triage-emoji {
-  font-size: 14px;
+  font-size: 15px;
   flex-shrink: 0;
 }
 
 .patient-portal__triage-name {
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 600;
   color: #1e293b;
   white-space: nowrap;
@@ -224,13 +228,14 @@
   text-overflow: ellipsis;
 }
 
-/* ── 4. Minimalist Utilities Panel ── */
+/* ── 4. Unified Discovery Card (Hospitals, Specialists, Medicines) ── */
+.patient-portal__discovery-card,
 .patient-portal__panel {
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 10px;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
 }
@@ -239,29 +244,37 @@
 .patient-portal__tabs {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 3px;
+  gap: 4px;
   background: #e2e8f0;
-  padding: 2.5px;
-  border-radius: 8px;
+  padding: 3px;
+  border-radius: 9px;
 }
 
-.patient-portal__tab {
+.patient-portal__tab,
+.patient-portal__tab-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 5px 0;
-  border-radius: 6px;
+  gap: 5px;
+  padding: 6px 4px;
+  border-radius: 7px;
   border: none;
   background: transparent;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   color: #64748b;
   cursor: pointer;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
-.patient-portal__tab--active {
+.patient-portal__tab:hover,
+.patient-portal__tab-btn:hover {
+  color: #0f172a;
+}
+
+.patient-portal__tab--active,
+.patient-portal__tab-btn--active {
   background: #ffffff;
   color: #0f172a;
   font-weight: 700;
@@ -273,7 +286,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
+  padding: 7px 10px;
   border-radius: 8px;
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -302,7 +315,7 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
-  max-height: 140px;
+  max-height: 190px;
   overflow-y: auto;
   padding-right: 2px;
 }
@@ -312,12 +325,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 6px 8px;
+  padding: 7px 9px;
   border-radius: 8px;
   background: #ffffff;
   border: 1px solid #e2e8f0;
   transition: all 0.15s ease;
 }
+
 
 .patient-portal__row:hover {
   border-color: #cbd5e1;
