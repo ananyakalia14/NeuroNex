@@ -1,0 +1,181 @@
+/* ── Navbar Styles ── */
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-2) var(--sp-4);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(27, 94, 32, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  gap: var(--sp-3);
+}
+
+/* Brand */
+.navbar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+}
+
+.navbar__logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+}
+
+.navbar__title-group {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.navbar__title {
+  font-size: var(--font-md);
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--jr-green-deep), var(--jr-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.navbar__subtitle {
+  font-size: 11px;
+  color: var(--jr-text-tertiary);
+  font-weight: 500;
+}
+
+/* Status indicators */
+.navbar__status {
+  display: none;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-2) var(--sp-4);
+  background: var(--jr-green-pale);
+  border-radius: var(--radius-pill);
+  box-shadow:
+    inset 2px 2px 4px rgba(255, 255, 255, 0.8),
+    inset -1px -1px 3px rgba(0, 0, 0, 0.03);
+}
+
+@media (min-width: 900px) {
+  .navbar__status {
+    display: flex;
+  }
+}
+
+.navbar__stat {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  color: var(--jr-green-deep);
+  font-size: var(--font-sm);
+}
+
+.navbar__stat-value {
+  font-weight: 700;
+  font-size: var(--font-base);
+}
+
+.navbar__stat-label {
+  font-weight: 400;
+  color: var(--jr-text-tertiary);
+  font-size: var(--font-xs);
+}
+
+.navbar__divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(27, 94, 32, 0.15);
+}
+
+/* Actions */
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+}
+
+.navbar__sync-badge {
+  animation: pulse-badge 2s infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Persona switcher button */
+.navbar__profile-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 4px 10px !important;
+  border-radius: var(--radius-pill) !important;
+  cursor: pointer;
+  background: var(--jr-surface);
+  border: 1px solid rgba(46, 125, 50, 0.15);
+  transition: all var(--transition-fast);
+}
+
+.navbar__profile-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--clay-shadow-hover);
+  border-color: var(--jr-green);
+}
+
+.navbar__profile-avatar {
+  font-size: 18px;
+}
+
+.navbar__profile-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.navbar__profile-name {
+  font-size: var(--font-xs);
+  color: var(--jr-text);
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navbar__role-badge {
+  font-size: 9px !important;
+  padding: 1px 6px !important;
+}
+
+.navbar__connectivity {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
+.navbar__conn-icon--online {
+  color: var(--jr-green);
+}
+
+.navbar__conn-icon--offline {
+  color: var(--jr-danger);
+}
+
+@media (max-width: 767px) {
+  .navbar__subtitle {
+    display: none;
+  }
+  .navbar__profile-name {
+    display: none;
+  }
+}

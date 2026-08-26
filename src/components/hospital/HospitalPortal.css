@@ -1,0 +1,191 @@
+/* ── HospitalPortal Styles ── */
+
+.hospital-portal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  height: 100%;
+  overflow-y: auto;
+}
+
+.hospital-portal__card {
+  padding: var(--sp-3) var(--sp-4);
+}
+
+.hospital-portal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+
+.hospital-portal__identity {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.hospital-portal__avatar {
+  font-size: 28px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--jr-blue-pale);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--clay-shadow);
+}
+
+.hospital-portal__title {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--jr-green-deep);
+  margin: 0;
+}
+
+.hospital-portal__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.hospital-portal__section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hospital-portal__section-title {
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--jr-green-deep);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0;
+}
+
+.hospital-portal__empty-queue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-1);
+  padding: var(--sp-5);
+  text-align: center;
+  border-radius: var(--radius-md);
+}
+
+.hospital-portal__queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.hospital-portal__queue-item {
+  padding: var(--sp-3) !important;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.hospital-portal__queue-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hospital-portal__queue-eta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-sm);
+}
+
+.hospital-portal__queue-details {
+  display: flex;
+  gap: var(--sp-3);
+  color: var(--jr-text-secondary);
+}
+
+.hospital-portal__prep-box {
+  background: var(--jr-bg);
+  padding: var(--sp-2);
+  border-radius: var(--radius-sm);
+}
+
+/* Beds Grid */
+.hospital-portal__beds-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-2);
+}
+
+@media (min-width: 600px) {
+  .hospital-portal__beds-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.hospital-portal__bed-control {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border-radius: var(--radius-md);
+}
+
+.hospital-portal__stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+}
+
+.hospital-portal__stepper .clay-btn--icon {
+  width: 34px;
+  height: 34px;
+}
+
+.hospital-portal__stepper-val {
+  font-size: var(--font-xl);
+  font-weight: 800;
+  color: var(--jr-green-deep);
+  min-width: 32px;
+  text-align: center;
+}
+
+/* Medicine grid */
+.hospital-portal__med-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-2);
+}
+
+@media (min-width: 600px) {
+  .hospital-portal__med-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.hospital-portal__med-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-3) !important;
+}
+
+.hospital-portal__med-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-1);
+}
+
+.hospital-portal__med-btns .clay-btn--icon {
+  width: 28px;
+  height: 28px;
+}

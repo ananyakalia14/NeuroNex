@@ -1,0 +1,132 @@
+/* ── LoginModal Styles ── */
+
+.login-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 25, 12, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-4);
+}
+
+.login-modal {
+  width: 100%;
+  max-width: 540px;
+  background: var(--jr-surface);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.login-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.login-modal__title {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  color: var(--jr-green-deep);
+  margin: 0;
+}
+
+.login-modal__subtitle {
+  font-size: var(--font-sm);
+  color: var(--jr-text-tertiary);
+  margin: 0;
+}
+
+.login-modal__roles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.login-modal__card {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4) !important;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all var(--transition-base);
+  position: relative;
+}
+
+.login-modal__card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--clay-shadow-hover);
+}
+
+.login-modal__card--selected {
+  border-color: var(--jr-green);
+  background: var(--jr-green-pale);
+}
+
+.login-modal__avatar {
+  font-size: 32px;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-circle);
+  background: var(--jr-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--clay-shadow);
+  flex-shrink: 0;
+}
+
+.login-modal__info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.login-modal__name-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.login-modal__name {
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--jr-text);
+  margin: 0;
+}
+
+.login-modal__desc {
+  font-size: var(--font-xs);
+  color: var(--jr-text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.login-modal__detail {
+  font-size: 11px;
+  color: var(--jr-text-tertiary);
+  font-weight: 500;
+}
+
+.login-modal__check {
+  color: var(--jr-green);
+  background: var(--jr-surface);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--clay-shadow);
+  flex-shrink: 0;
+}

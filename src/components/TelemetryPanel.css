@@ -1,0 +1,96 @@
+/* ── TelemetryPanel Styles ── */
+
+.telemetry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.telemetry__title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--jr-green-deep);
+  margin: 0;
+}
+
+.telemetry__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+
+@media (max-width: 767px) {
+  .telemetry__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.telemetry__metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  background: var(--jr-bg);
+  border-radius: var(--radius-md);
+  box-shadow:
+    inset 2px 2px 5px rgba(255, 255, 255, 0.7),
+    inset -1px -1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.telemetry__metric-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--jr-text-secondary);
+}
+
+.telemetry__metric-value {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-1);
+}
+
+.telemetry__big-num {
+  font-size: var(--font-2xl);
+  font-weight: 800;
+  color: var(--jr-green-deep);
+  line-height: 1;
+}
+
+.telemetry__metric-sub {
+  display: flex;
+  gap: var(--sp-1);
+  font-size: var(--font-xs);
+}
+
+/* Medicine tags */
+.telemetry__med-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+}
+
+.telemetry__med-tag {
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--jr-danger-light);
+  border-radius: var(--radius-pill);
+}
+
+/* System stats */
+.telemetry__sys-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.telemetry__sys-row {
+  display: flex;
+  justify-content: space-between;
+}

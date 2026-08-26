@@ -1,0 +1,93 @@
+/* ── SplashScreen Styles — Clean Light Green Aesthetic ── */
+
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-splash);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Light Green Shade */
+  background: radial-gradient(circle at 50% 40%, #FAFCF8 0%, #F1F8E9 40%, #E8F5E9 80%, #DCEDC8 100%);
+  cursor: pointer;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Soft ambient light halos */
+.splash__glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.splash__glow--green {
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(129, 199, 132, 0.45), transparent 70%);
+  top: -10%;
+  left: 20%;
+}
+
+.splash__glow--mint {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(165, 214, 167, 0.4), transparent 70%);
+  bottom: -10%;
+  right: 15%;
+}
+
+/* Central Content Container */
+.splash__content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  width: 100%;
+  max-width: 680px;
+  padding: 0 var(--sp-4);
+}
+
+/* Hero Logo Presentation */
+.splash__logo-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.splash__logo-img {
+  width: min(85vw, 520px);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 32px rgba(27, 94, 32, 0.12));
+}
+
+@media (max-width: 767px) {
+  .splash__logo-img {
+    width: min(90vw, 360px);
+  }
+}
+
+/* Glowing GPS Lifeline */
+.splash__lifeline-wrapper {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  justify-content: center;
+  margin-top: var(--sp-1);
+}
+
+.splash__lifeline-svg {
+  width: 100%;
+  height: 48px;
+  overflow: visible;
+}

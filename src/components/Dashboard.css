@@ -1,0 +1,236 @@
+/* ── Dashboard Layout Styles ── */
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.dashboard__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ═══ Desktop 3-panel ═══ */
+.dashboard__panels {
+  display: none;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .dashboard__panels {
+    display: flex;
+  }
+  .dashboard__mobile-content,
+  .dashboard__mobile-nav {
+    display: none !important;
+  }
+}
+
+/* Left sidebar */
+.dashboard__left {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--jr-surface);
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  position: relative;
+  transition: width 0.05s ease-out;
+}
+
+.dashboard__left--collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  border-right: none !important;
+}
+
+/* ↔️ Interactive Map / Sidebar Draggable Resizer */
+.dashboard__resizer {
+  width: 14px;
+  margin: 0 -7px;
+  z-index: 40;
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  user-select: none;
+  touch-action: none;
+}
+
+.dashboard__resizer-line {
+  width: 3px;
+  height: 100%;
+  background: transparent;
+  transition: background var(--transition-fast);
+}
+
+.dashboard__resizer:hover .dashboard__resizer-line,
+.dashboard__resizer--dragging .dashboard__resizer-line {
+  background: var(--jr-green);
+  box-shadow: 0 0 8px var(--jr-green-glow);
+}
+
+.dashboard__resizer-toggle-pill {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 38px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--jr-text-secondary);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  transition: all var(--transition-fast);
+  z-index: 50;
+}
+
+.dashboard__resizer-toggle-pill:hover {
+  background: var(--jr-green-deep) !important;
+  color: #ffffff !important;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.dashboard__panel-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dashboard__panel-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--jr-text-tertiary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border-bottom: 2px solid transparent;
+}
+
+.dashboard__panel-tab:hover {
+  color: var(--jr-text-secondary);
+  background: var(--jr-green-glass);
+}
+
+.dashboard__panel-tab--active {
+  color: var(--jr-green-deep);
+  border-bottom-color: var(--jr-green);
+  background: var(--jr-green-glass);
+}
+
+.dashboard__panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--sp-3);
+}
+
+/* Center map */
+.dashboard__center {
+  flex: 1;
+  min-width: 0;
+  padding: var(--sp-2);
+  display: flex;
+}
+
+/* Right sidebar */
+.dashboard__right {
+  flex-shrink: 0;
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  background: var(--jr-surface);
+  border-left: 1px solid rgba(0, 0, 0, 0.05);
+  overflow-y: auto;
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .dashboard__left {
+    width: 300px;
+  }
+  .dashboard__right {
+    width: 280px;
+  }
+}
+
+/* ═══ Mobile layout ═══ */
+.dashboard__mobile-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .dashboard__mobile-content {
+    display: none;
+  }
+}
+
+.dashboard__mobile-panel {
+  flex: 1;
+  padding: var(--sp-3);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+/* Mobile bottom nav */
+.dashboard__mobile-nav {
+  display: flex;
+  background: var(--jr-surface);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.04);
+  padding: var(--sp-1) 0;
+  padding-bottom: env(safe-area-inset-bottom, var(--sp-1));
+  position: sticky;
+  bottom: 0;
+  z-index: var(--z-sticky);
+}
+
+@media (min-width: 768px) {
+  .dashboard__mobile-nav {
+    display: none;
+  }
+}
+
+.dashboard__mobile-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--sp-2) var(--sp-1);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--jr-text-tertiary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dashboard__mobile-tab--active {
+  color: var(--jr-green);
+}

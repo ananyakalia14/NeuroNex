@@ -1,0 +1,9 @@
+/* ── App Styles ── */
+
+.app {
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}

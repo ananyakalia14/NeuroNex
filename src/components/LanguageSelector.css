@@ -1,0 +1,46 @@
+/* ── LanguageSelector Styles — Claymorphic Language Switcher ── */
+
+.lang-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 4px 6px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: var(--clay-shadow);
+  backdrop-filter: blur(8px);
+}
+
+.lang-selector__globe {
+  color: var(--jr-green-deep);
+  margin-left: 4px;
+}
+
+.lang-selector__buttons {
+  display: flex;
+  gap: 2px;
+}
+
+.lang-selector__btn {
+  border: none;
+  background: transparent;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+  color: var(--jr-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.lang-selector__btn:hover {
+  color: var(--jr-text);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.lang-selector__btn--active {
+  background: var(--jr-green-deep) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(27, 94, 32, 0.35);
+}

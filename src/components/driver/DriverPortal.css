@@ -1,0 +1,314 @@
+/* ── DriverPortal Styles — Sleek Apple/Uber Style Cockpit HUD ── */
+
+.driver-portal {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  padding-bottom: var(--sp-4);
+}
+
+/* ── 1. Compact Header Strip ── */
+.driver-portal__header-card {
+  padding: 10px 14px !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: var(--radius-xl) !important;
+}
+
+.driver-portal__header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.driver-portal__amb-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--jr-danger-pale);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--jr-danger);
+  flex-shrink: 0;
+  box-shadow: var(--clay-shadow);
+}
+
+.driver-portal__veh-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.driver-portal__veh-num {
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--jr-text);
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+.driver-portal__badge-als {
+  background: var(--jr-danger);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+}
+
+.driver-portal__pilot-sub {
+  font-size: 11px;
+  color: var(--jr-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 1px;
+}
+
+.driver-portal__header-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.driver-portal__ctrl-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--jr-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--clay-shadow);
+  transition: all var(--transition-fast);
+}
+
+.driver-portal__ctrl-btn:hover {
+  color: var(--jr-text);
+}
+
+.driver-portal__ctrl-btn--siren-on {
+  background: var(--jr-danger-pale) !important;
+  color: var(--jr-danger) !important;
+  border-color: var(--jr-danger) !important;
+  box-shadow: 0 0 10px var(--jr-danger-glow) !important;
+}
+
+.driver-portal__ctrl-btn--voice-on {
+  background: var(--jr-green-pale) !important;
+  color: var(--jr-green-deep) !important;
+  border-color: var(--jr-green) !important;
+}
+
+/* ── 2. Turn Maneuver Banner ── */
+.driver-portal__turn-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #1B5E20, #2E7D32);
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 14px rgba(27, 94, 32, 0.35);
+}
+
+.driver-portal__turn-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.driver-portal__turn-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.driver-portal__turn-dist {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #C8E6C9;
+}
+
+.driver-portal__turn-street {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+/* ── 3. Metrics Row ── */
+.driver-portal__metrics-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.driver-portal__metric-pill {
+  padding: 8px 4px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: var(--radius-md) !important;
+}
+
+.driver-portal__metric-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--jr-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.driver-portal__metric-val {
+  font-size: 16px;
+  font-weight: 900;
+  margin-top: 1px;
+  line-height: 1.1;
+}
+
+.driver-portal__metric-val small {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--jr-text-secondary);
+}
+
+/* ── 4. Mission Card ── */
+.driver-portal__mission-card {
+  padding: 12px 14px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-radius: var(--radius-xl) !important;
+}
+
+.driver-portal__mission-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 6px;
+}
+
+.driver-portal__gps-tag {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--jr-green-deep);
+}
+
+.driver-portal__info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.driver-portal__info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.driver-portal__info-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--jr-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.driver-portal__info-value {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--jr-text);
+}
+
+.driver-portal__info-text {
+  font-size: 12px;
+  color: var(--jr-text-secondary);
+  line-height: 1.2;
+}
+
+/* Stacked Calling Buttons */
+.driver-portal__hotline-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.driver-portal__action-call-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-lg);
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none !important;
+  box-shadow: var(--clay-shadow);
+  transition: all var(--transition-fast);
+}
+
+.driver-portal__action-call-btn--patient {
+  background: var(--jr-danger-pale);
+  color: var(--jr-danger) !important;
+  border: 1.5px solid var(--jr-danger);
+}
+
+.driver-portal__action-call-btn--patient:hover {
+  background: var(--jr-danger);
+  color: #ffffff !important;
+}
+
+.driver-portal__action-call-btn--hospital {
+  background: rgba(33, 150, 243, 0.08);
+  color: #1976D2 !important;
+  border: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.driver-portal__action-call-btn--hospital:hover {
+  background: #1976D2;
+  color: #ffffff !important;
+}
+
+/* Standby card */
+.driver-portal__standby-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-6) var(--sp-4) !important;
+  text-align: center;
+}
+
+/* Gear strip */
+.driver-portal__gear-strip {
+  padding: 8px 12px !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+.driver-portal__gear-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
